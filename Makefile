@@ -17,11 +17,11 @@ COLORIZE   	= sed ''/PASS/s//$(PASS)/'' | sed ''/FAIL/s//$(FAIL)/''
 .PHONY: upload
 upload: binary
 	zip $(SERVICE_NAME)-function *
-	aws --profile $(AWS_PROFILE) s3 mv $(SERVICE_NAME)-function.zip s3://$(AWS_BUCKET_NAME)/
+	AWS_PROFILE=$(AWS_PROFILE) aws s3 mv $(SERVICE_NAME)-function.zip s3://$(AWS_BUCKET_NAME)/
 
 .PHONY: deploy
 deploy: upload
-	sam deploy --profile $(AWS_PROFILE) \
+	AWS_PROFILE=$(AWS_PROFILE) sam deploy \
 		--template $(AWS_TEMPLATE) \
 		--stack-name $(AWS_STACK_NAME) \
 		--s3-bucket $(AWS_BUCKET_NAME) \
@@ -29,10 +29,9 @@ deploy: upload
 
 .PHONY: describe
 describe:
-	AWS_PAGER="" aws cloudformation describe-stacks \
+	AWS_PROFILE=$(AWS_PROFILE) AWS_PAGER="" aws cloudformation describe-stacks \
 			--region $(AWS_REGION) \
-			--stack-name $(AWS_STACK_NAME) \
-			--profile $(AWS_PROFILE)
+			--stack-name $(AWS_STACK_NAME)
 
 .PHONY: up
 up: binary

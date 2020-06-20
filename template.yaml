@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: daily cron job that uploads faa aircraft registration to s3
+Resources:
+    UploadFaaAircraftRegistrationDaily:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: go1.x
+            Handler: main
+            Timeout: 300
+            CodeUri: .
+            MemorySize: 2048
+            Policies:
+            - S3WritePolicy:
+                BucketName: aircraft-registry
+            Events:
+                Daily:
+                    InvocationLevel:
+                    Type: Schedule
+                    Properties:
+                        Schedule: cron(0 6 * * ? *)
+            Tags: 
+                project: aviation
+    

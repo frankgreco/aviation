@@ -1,6 +1,4 @@
 # aviation
-> open aviation data from the faa
-
 ![build and deploy project](https://github.com/frankgreco/aviation/workflows/build%20and%20deploy%20project/badge.svg?branch=master)
 
 

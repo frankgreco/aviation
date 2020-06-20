@@ -1,24 +1,20 @@
-name: build and deploy project
+name: deploy
 
 on:
   push:
     branches: [ master ]
 
 jobs:
-
-  build:
-    name: Build
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
     steps:
-
-    - name: Set up Go 1.x
+    - name: go
       uses: actions/setup-go@v2
       with:
         go-version: ^1.13
       id: go
-
-    - name: Check out code into the Go module directory
+    - name: checkout
       uses: actions/checkout@v2
-
-    - name: Build
+    - name: build
       run: make binary

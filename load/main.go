@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/confluentinc/cc-utils/pg"
+	pg "github.com/frankgreco/aviation/utils/db"
 )
 
 var (

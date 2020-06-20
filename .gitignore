@@ -1,0 +1,5 @@
+*.txt
+.aws-sam
+package.yml
+*.zip
+main

@@ -1,5 +1,5 @@
 # aviation
-![build and deploy project](https://github.com/frankgreco/aviation/workflows/build%20and%20deploy%20project/badge.svg?branch=master)
+![deploy](https://github.com/frankgreco/aviation/workflows/deploy/badge.svg)
 
 
 ## download

@@ -141,6 +141,10 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 				providedQuery = q
 			}
 		}
+		if providedQuery == nil {
+			level.Warn(db.logger).Log("msg", fmt.Sprintf("query %s was not provided", qs.Name))
+			continue
+		}
 		q, args, err := providedQuery.ToSql()
 		if err != nil {
 			msg := fmt.Sprintf("failed to generate sql for query %s", qs.Name)

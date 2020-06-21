@@ -7,6 +7,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/Masterminds/squirrel"
@@ -59,7 +60,7 @@ func main() {
 		defer wg.Done()
 		if _, err := dbase.QueryRowsTx(context.Background(), nil, buildQueries(
 			150,
-			psq.Insert("aviation.aircraft").Columns("manufacturer, model, series, manufactuer_name, model_name, num_engines, num_seats, weight, cruising_speed"),
+			psq.Insert("aviation.aircraft").Columns(strings.Join((api.Aircraft{}).Columns(), ", ")),
 			aircraft,
 		)...); err != nil {
 			dbase.Close()
@@ -71,7 +72,7 @@ func main() {
 		defer wg.Done()
 		if _, err := dbase.QueryRowsTx(context.Background(), nil, buildQueries(
 			150,
-			psq.Insert("aviation.registration").Columns("unique_id, id, serial_number, year_manufactured, manufacturer, model, series"),
+			psq.Insert("aviation.registration").Columns(strings.Join((api.Registration{}).Columns(), ", ")),
 			registrations,
 		)...); err != nil {
 			dbase.Close()
@@ -80,7 +81,6 @@ func main() {
 	}()
 
 	wg.Wait()
-
 }
 
 func unmarshal(r io.Reader, rb api.Unmarshaler) []api.RowBuilder {

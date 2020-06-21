@@ -1,4 +1,4 @@
-package pg
+package db
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/go-kit/kit/log"
@@ -56,6 +57,26 @@ func Open(driverName, url string, logger log.Logger) (*DB, error) {
 	return db, nil
 }
 
+func (db *DB) logStats() {
+	t := time.NewTicker(3 * time.Second)
+	for {
+		select {
+		case <-t.C:
+			stats := db.DB.Stats()
+			db.logger.Log(
+				"msg", "db stats",
+				"idle", stats.Idle,
+				"open conns", stats.OpenConnections,
+				"in use", stats.InUse,
+				"wait count", stats.WaitCount,
+				"wait duration", stats.WaitDuration,
+				"max idle closed", stats.MaxIdleClosed,
+				"max lifetime closed", stats.MaxLifetimeClosed,
+			)
+		}
+	}
+}
+
 func (db *DB) QueryRows(ctx context.Context, scanFunc ScanFunc, query sq.Sqlizer) (out []interface{}, err error) {
 	return db.QueryRowsTx(ctx, nil, QueryScan{
 		Query:    query,
@@ -92,7 +113,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 			Isolation: sql.LevelSerializable,
 		})
 		if err != nil {
-			return nil, corev1.WrapErr(err, "could not begin transaction")
+			return nil, errors.New(fmt.Sprintf("could not begin transaction: %s", err.Error()))
 		}
 		defer tx.Rollback()
 		driver.maybeTx = tx
@@ -124,14 +145,14 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		if err != nil {
 			msg := fmt.Sprintf("failed to generate sql for query %s", qs.Name)
 			level.Error(db.logger).Log("error", msg)
-			return nil, corev1.WrapErr(err, msg)
+			return nil, errors.New(fmt.Sprintf("%s: %s", msg, err.Error()))
 		}
 		// Execute the query.
 		rows, err := driver.QueryxContext(ctx, q, args...)
 		if err != nil {
 			msg := fmt.Sprintf("failed to query %s", qs.Name)
 			level.Error(db.logger).Log("error", msg)
-			return nil, corev1.WrapErr(err, msg)
+			return nil, errors.New(fmt.Sprintf("%s: %s", msg, err.Error()))
 		}
 		defer rows.Close()
 		// Load first row now so that we can check for the final batch of errors.
@@ -140,7 +161,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		if err := rows.Err(); err != nil {
 			msg := fmt.Sprintf("failed to query %s", qs.Name)
 			level.Error(db.logger).Log("error", msg)
-			return nil, corev1.WrapErr(err, msg)
+			return nil, errors.New(fmt.Sprintf("%s: %s", msg, err.Error()))
 		}
 		// The query was successful. This doesn't mean rows were returned.
 		// We can't blindly return ErrNotFound as the query may not have requested rows.
@@ -155,7 +176,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 			// Envoke callback.
 			out, err = qs.Callback(rows)
 			if err != nil {
-				return nil, corev1.WrapErr(err, "error scanning rows")
+				return nil, errors.New(fmt.Sprintf("error scanning rows: %s", err.Error()))
 			}
 		}
 		rows.Close()
@@ -164,7 +185,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 	if len(queryScans) > 1 && existingTx == nil {
 		level.Debug(db.logger).Log("msg", "committing transaction")
 		if err := driver.maybeTx.(*sqlx.Tx).Commit(); err != nil {
-			err = corev1.WrapErr(err, "could not commit transaction")
+			return nil, errors.New(fmt.Sprintf("could not commit transaction: %s", err.Error()))
 			level.Error(db.logger).Log("error", err)
 			return nil, err
 		}

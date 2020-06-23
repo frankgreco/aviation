@@ -7,16 +7,19 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/frankgreco/aviation"
 	"github.com/frankgreco/aviation/api"
 	"github.com/frankgreco/aviation/utils/db"
 )
@@ -27,6 +30,18 @@ var (
 )
 
 func main() {
+	sesh, err := session.NewSessionWithOptions(session.Options{
+		Config: aws.Config{
+			Region: aws.String(aviation.AwsRegion),
+		},
+	})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err.Error(),
+		}).Error("could not create aws session")
+		panic(err)
+	}
+
 	dbase, err := db.New(dbURL, log.New().WithFields(log.Fields{
 		"app": "database",
 	}))
@@ -35,9 +50,8 @@ func main() {
 	}
 	defer dbase.Close()
 
-	now := time.Now().UTC()
 	log.WithFields(log.Fields{
-		"time": now,
+		"time": aviation.Now,
 	}).Info("now")
 
 	var wg sync.WaitGroup
@@ -48,9 +62,10 @@ func main() {
 
 		if err := process(
 			"registrations",
-			"master.txt",
-			now,
+			"MASTER.txt",
+			aviation.Now,
 			dbase,
+			sesh,
 			func(items []api.RowBuilder) squirrel.SelectBuilder {
 				return psq.
 					Select("sub.id").
@@ -79,9 +94,10 @@ func main() {
 
 		if err := process(
 			"aircraft",
-			"aircraft.txt",
-			now,
+			"ACFTREF.txt",
+			aviation.Now,
 			dbase,
+			sesh,
 			func(items []api.RowBuilder) squirrel.SelectBuilder {
 				return psq.
 					Select("sub.manufacturer || '-' ||  sub.model || '-' || sub.series as id").
@@ -107,14 +123,31 @@ func main() {
 	wg.Wait()
 }
 
-func process(resource, fileLocation string, now time.Time, dbase *db.DB, diffQuery func([]api.RowBuilder) squirrel.SelectBuilder, insertQuery squirrel.InsertBuilder, f func(string) api.RowBuilder) error {
-	file, err := os.Open(fileLocation)
+func getDataFromS3(file string, sesh *session.Session) (io.ReadCloser, error) {
+	key := fmt.Sprintf("%s/%s", aviation.Date, file)
+	out, err := s3.New(sesh).GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(aviation.AwsS3BucketName),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		log.WithFields(log.Fields{
+			"file": key,
+			"err":  err.Error(),
+		}).Error("could not get file from aws s3")
+		return nil, err
+	}
+
+	return out.Body, nil
+}
+
+func process(resource, fileLocation string, now time.Time, dbase *db.DB, sesh *session.Session, diffQuery func([]api.RowBuilder) squirrel.SelectBuilder, insertQuery squirrel.InsertBuilder, f func(string) api.RowBuilder) error {
+	data, err := getDataFromS3(fileLocation, sesh)
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+	defer data.Close()
 
-	items := unmarshal(file, f)
+	items := unmarshal(data, f)
 
 	_, err = dbase.QueryRowsTx(context.Background(), nil, buildQueries(
 		resource,
@@ -127,8 +160,6 @@ func process(resource, fileLocation string, now time.Time, dbase *db.DB, diffQue
 }
 
 func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilder, dbase *db.DB) []api.RowBuilder {
-	netIDs := []string{}
-
 	if _, err := dbase.QueryRowsTx(context.Background(), nil, db.QueryScan{
 		Name:  fmt.Sprintf("get all %s not currently in the database", resource),
 		Query: query,
@@ -215,7 +246,7 @@ func buildQueries(resource string, batchSize int, base squirrel.InsertBuilder, i
 		query := base
 
 		for _, item := range items[i : i+size] {
-			query = query.Values(append(item.Values(), now)...)
+			query = query.Values(append(item.Values(), now.UTC())...)
 		}
 		queries[j] = db.QueryScan{
 			Name:  fmt.Sprintf("inserting %s [%d,%d)", resource, i, i+size),

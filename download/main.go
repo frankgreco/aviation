@@ -14,12 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	log "github.com/sirupsen/logrus"
-)
 
-const (
-	faaDatabaseURL  = "http://registry.faa.gov/database/ReleasableAircraft.zip"
-	awsRegion       = "us-west-2"
-	awsS3BucketName = "aircraft-registry"
+	"github.com/frankgreco/aviation"
 )
 
 func main() {
@@ -29,15 +25,15 @@ func main() {
 func do(ctx context.Context) error {
 
 	log.WithFields(log.Fields{
-		"url": faaDatabaseURL,
+		"url": aviation.FaaDatabaseURL,
 	}).Info("retrieving archive file from url")
 
 	// download zip file
 	beginDownload := time.Now()
-	resp, err := http.Get(faaDatabaseURL)
+	resp, err := http.Get(aviation.FaaDatabaseURL)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"url": faaDatabaseURL,
+			"url": aviation.FaaDatabaseURL,
 			"err": err.Error(),
 		}).Error("could not retrieve file from url")
 		return err
@@ -46,7 +42,7 @@ func do(ctx context.Context) error {
 
 	log.WithFields(log.Fields{
 		"time": time.Since(beginDownload),
-		"url":  faaDatabaseURL,
+		"url":  aviation.FaaDatabaseURL,
 	}).Info("successfully retrieved archive file from url")
 
 	// read response body
@@ -93,7 +89,7 @@ func do(ctx context.Context) error {
 
 	sesh, err := session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
-			Region: aws.String(awsRegion),
+			Region: aws.String(aviation.AwsRegion),
 		},
 	})
 	if err != nil {
@@ -111,7 +107,7 @@ func do(ctx context.Context) error {
 		key := fmt.Sprintf("%s/%s", date, name)
 
 		if _, err := s3.New(sesh).PutObject(&s3.PutObjectInput{
-			Bucket:        aws.String(awsS3BucketName),
+			Bucket:        aws.String(aviation.AwsS3BucketName),
 			Key:           aws.String(key),
 			Body:          bytes.NewReader(data),
 			ContentLength: aws.Int64(int64(len(data))),

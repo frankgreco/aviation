@@ -1,6 +1,9 @@
 package api
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Aircraft struct {
 	Manufacturer     string
@@ -40,6 +43,14 @@ func (ac Aircraft) Values() []interface{} {
 		ac.Weight,
 		ac.CruisingSpeed,
 	}
+}
+
+func (reg Aircraft) ID() string {
+	return fmt.Sprintf("%s-%s-%s", reg.Manufacturer, reg.Model, reg.Series)
+}
+
+func (reg Aircraft) DBValue() string {
+	return fmt.Sprintf("('%s', '%s', '%s')", reg.Manufacturer, reg.Model, reg.Series)
 }
 
 func (reg *Aircraft) Unmarshal(data string) RowBuilder {

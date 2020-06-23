@@ -5,25 +5,30 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"os"
 	"reflect"
 	"strings"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/log/level"
 	_ "github.com/jackc/pgx/v4/stdlib" // this import registers the pgx driver
 	"github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
 	ErrNotFound = errors.New("resource not found")
 )
 
+type logger interface {
+	Debug(...interface{})
+	Info(...interface{})
+	Warn(...interface{})
+	Error(...interface{})
+}
+
 type DB struct {
 	*sqlx.DB
-	logger log.Logger
+	logger logger
 }
 
 type ScanFunc func(*sqlx.Rows) ([]interface{}, error)
@@ -37,11 +42,11 @@ type QueryScan struct {
 	Callback  ScanFunc
 }
 
-func New(url string, logger log.Logger) (*DB, error) {
+func New(url string, logger logger) (*DB, error) {
 	return Open("pgx", url, logger)
 }
 
-func Open(driverName, url string, logger log.Logger) (*DB, error) {
+func Open(driverName, url string, logger logger) (*DB, error) {
 	sqlDB, err := sql.Open(driverName, url)
 	if err != nil {
 		return nil, err
@@ -49,7 +54,7 @@ func Open(driverName, url string, logger log.Logger) (*DB, error) {
 	sqlxDB := sqlx.NewDb(sqlDB, "pgx")
 
 	if logger == nil {
-		logger = log.NewJSONLogger(os.Stdout)
+		logger = log.New()
 	}
 
 	db := &DB{sqlxDB, logger}
@@ -63,7 +68,7 @@ func (db *DB) logStats() {
 		select {
 		case <-t.C:
 			stats := db.DB.Stats()
-			db.logger.Log(
+			db.logger.Debug(
 				"msg", "db stats",
 				"idle", stats.Idle,
 				"open conns", stats.OpenConnections,
@@ -108,12 +113,12 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 
 	// If transaction, update the driver and begin th transaction.
 	if len(queryScans) > 1 && existingTx == nil {
-		level.Debug(db.logger).Log("msg", "beginning transaction")
+		db.logger.Debug("beginning transaction")
 		tx, err := db.BeginTxx(ctx, &sql.TxOptions{
 			Isolation: sql.LevelSerializable,
 		})
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("could not begin transaction: %s", err.Error()))
+			return nil, fmt.Errorf("could not begin transaction: %s", err.Error())
 		}
 		defer tx.Rollback()
 		driver.maybeTx = tx
@@ -127,7 +132,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		if qs.Name == "" {
 			qs.Name = fmt.Sprintf("#%d", i)
 		}
-		level.Debug(db.logger).Log("msg", fmt.Sprintf("processing query %s", qs.Name))
+		db.logger.Debug(fmt.Sprintf("processing query %s", qs.Name))
 		// Compile the query.
 		var providedQuery sq.Sqlizer
 		{
@@ -135,28 +140,29 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 			if qs.QueryFunc != nil {
 				q, err := qs.QueryFunc()
 				if err != nil {
-					level.Error(db.logger).Log("error", err.Error())
+					db.logger.Error(err.Error())
 					return nil, err
 				}
 				providedQuery = q
 			}
 		}
 		if providedQuery == nil {
-			level.Warn(db.logger).Log("msg", fmt.Sprintf("query %s was not provided", qs.Name))
+			db.logger.Warn(fmt.Sprintf("query %s was not provided", qs.Name))
 			continue
 		}
 		q, args, err := providedQuery.ToSql()
 		if err != nil {
 			msg := fmt.Sprintf("failed to generate sql for query %s", qs.Name)
-			level.Error(db.logger).Log("error", msg)
-			return nil, errors.New(fmt.Sprintf("%s: %s", msg, err.Error()))
+			db.logger.Error(msg)
+			return nil, fmt.Errorf("%s: %s", msg, err.Error())
 		}
+		db.logger.Debug("query", q)
 		// Execute the query.
 		rows, err := driver.QueryxContext(ctx, q, args...)
 		if err != nil {
 			msg := fmt.Sprintf("failed to query %s", qs.Name)
-			level.Error(db.logger).Log("error", msg)
-			return nil, errors.New(fmt.Sprintf("%s: %s", msg, err.Error()))
+			db.logger.Error(msg)
+			return nil, fmt.Errorf("%s: %s", msg, err.Error())
 		}
 		defer rows.Close()
 		// Load first row now so that we can check for the final batch of errors.
@@ -164,8 +170,8 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		// Second place where errors for the above query can be returned.
 		if err := rows.Err(); err != nil {
 			msg := fmt.Sprintf("failed to query %s", qs.Name)
-			level.Error(db.logger).Log("error", msg)
-			return nil, errors.New(fmt.Sprintf("%s: %s", msg, err.Error()))
+			db.logger.Error(msg)
+			return nil, fmt.Errorf("%s: %s", msg, err.Error())
 		}
 		// The query was successful. This doesn't mean rows were returned.
 		// We can't blindly return ErrNotFound as the query may not have requested rows.
@@ -180,17 +186,17 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 			// Envoke callback.
 			out, err = qs.Callback(rows)
 			if err != nil {
-				return nil, errors.New(fmt.Sprintf("error scanning rows: %s", err.Error()))
+				return nil, fmt.Errorf("error scanning rows: %s", err.Error())
 			}
 		}
 		rows.Close()
 	}
 	// If we used a transaction, attempt to commit.
 	if len(queryScans) > 1 && existingTx == nil {
-		level.Debug(db.logger).Log("msg", "committing transaction")
+		db.logger.Debug("committing transaction")
 		if err := driver.maybeTx.(*sqlx.Tx).Commit(); err != nil {
-			return nil, errors.New(fmt.Sprintf("could not commit transaction: %s", err.Error()))
-			level.Error(db.logger).Log("error", err)
+			err = fmt.Errorf("could not commit transaction: %s", err.Error())
+			db.logger.Error(err)
 			return nil, err
 		}
 	}

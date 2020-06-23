@@ -6,7 +6,7 @@
 
 The download app will retrieve the [database](https://www.faa.gov/licenses_certificates/aircraft_certification/aircraft_registry/releasable_aircraft_download/) of registered aircraft from the FAA and place it into S3 for further processing. The FAA updates this file every day at 04:30 UTC and this application will run every day, as an AWS Lambda function, at 06:00 UTC.
 
-The following is example an example log after a successful exectuion.
+The following is an example an example log after a successful execution.
 
 ```
 INFO[0000] retrieving archive file from url              url="http://registry.faa.gov/database/ReleasableAircraft.zip"
@@ -35,3 +35,9 @@ INFO[0041] successfully uploaded all files to aws s3     fields.time=34.93322500
 ## load
 
 The load app will update a PostgreSQL database every day from the updated FAA database. This will run as an AWS Lambda function and will be triggered after the completion of the _download_ application.
+
+The following is an example log after a successful execution
+```
+INFO[0001] new aircraft                                  aircraft=002-09-01
+INFO[0002] new registrations                             registrations=00000000
+```

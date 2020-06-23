@@ -7,10 +7,11 @@ require (
 	github.com/frankgreco/aviation/utils v0.0.0
 	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/jackc/pgx/v4 v4.6.0 // indirect
-	github.com/jmoiron/sqlx v1.2.0 // indirect
+	github.com/jmoiron/sqlx v1.2.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/sirupsen/logrus v1.4.2
 	github.com/stretchr/objx v0.2.0 // indirect
 )
 

@@ -1,6 +1,9 @@
 package api
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Address struct {
 	Street1 string
@@ -42,6 +45,14 @@ type Registration struct {
 	UniqueID                 string
 	KitManufacturer          string
 	KitModel                 string
+}
+
+func (reg Registration) ID() string {
+	return reg.UniqueID
+}
+
+func (reg Registration) DBValue() string {
+	return fmt.Sprintf("('%s')", reg.ID())
 }
 
 func (reg *Registration) Unmarshal(data string) RowBuilder {

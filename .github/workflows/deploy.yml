@@ -17,9 +17,9 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
     - name: build download
-      run: pwd && GO_BINARY=download make binary
+      run: cd download && go build ./...
     - name: build load
-      run: GO_BINARY=load make binary
+      run: cd load && go build ./...
     - name: deploy
       run: RDS_USERNAME=${{ secrets.RDS_USERNAME }} RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} RDS_ENDPOINT=${{ secrets.RDS_ENDPOINT }} make deploy
       env: 

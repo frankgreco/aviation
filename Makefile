@@ -19,7 +19,8 @@ deploy:
 		--template $(AWS_TEMPLATE) \
 		--stack-name $(AWS_STACK_NAME) \
 		--s3-bucket $(AWS_BUCKET_NAME) \
-		--capabilities CAPABILITY_NAMED_IAM 
+		--capabilities CAPABILITY_NAMED_IAM \
+		--parameter-overrides "RdsUsername=$(RDS_USERNAME)" "RdsPassword=$(RDS_PASSWORD)" "RdsEndpoint=$(RDS_ENDPOINT)"
 
 .PHONY: describe
 describe:
@@ -49,4 +50,4 @@ fmt:
 
 .PHONY: binary
 binary:
-	@GOOS=darwin GO111MODULE=on go build -o bin/$(GO_BINARY) ./$(GO_BINARY)
+	@GOOS=linux GO111MODULE=on go build -o bin/$(GO_BINARY) ./$(GO_BINARY)

@@ -36,7 +36,7 @@ func main() {
 	lambda.Start(do)
 
 	// uncomment this code to do a quick test locally without using sam
-
+	//
 	// if err := do(context.Background()); err != nil {
 	// 	log.WithFields(log.Fields{
 	// 		"errors": err.Error(),
@@ -58,6 +58,7 @@ func do(ctx context.Context) error {
 		}).Error("could not create aws session")
 		return err
 	}
+	log.Info("successfully created aws session")
 
 	dbase, err := db.New(dbURL, log.New().WithFields(log.Fields{
 		"app": "database",

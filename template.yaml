@@ -15,7 +15,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: go1.x
-            Handler: bin/download
+            Handler: download/download
             Timeout: 300
             CodeUri: .
             MemorySize: 2048
@@ -34,7 +34,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: go1.x
-            Handler: aviation_bins/load
+            Handler: load/load
             Timeout: 300
             CodeUri: .
             MemorySize: 2048

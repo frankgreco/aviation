@@ -54,4 +54,4 @@ fmt:
 
 .PHONY: binary
 binary:
-	@GOOS=linux GO111MODULE=on go build -o main ./download
+	@GOOS=linux GO111MODULE=on go build -o bin/$(GO_BINARY) ./$(GO_BINARY)

@@ -68,6 +68,9 @@ func (ac Registration) Columns() []string {
 		"manufacturer",
 		"model",
 		"series",
+		"registrant_type",
+		"registrant_name",
+		"fractional_ownership",
 	}
 }
 
@@ -80,6 +83,9 @@ func (reg Registration) Values() []interface{} {
 		reg.AircraftManufacturerCode,
 		reg.AircraftModelCode,
 		reg.AircraftSeriesCode,
+		reg.RegistrantType,
+		reg.RegistrantName,
+		reg.FractionalOwnership,
 	}
 }
 

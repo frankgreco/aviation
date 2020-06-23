@@ -160,6 +160,8 @@ func process(resource, fileLocation string, now time.Time, dbase *db.DB, sesh *s
 }
 
 func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilder, dbase *db.DB) []api.RowBuilder {
+	netIDs := []string{}
+
 	if _, err := dbase.QueryRowsTx(context.Background(), nil, db.QueryScan{
 		Name:  fmt.Sprintf("get all %s not currently in the database", resource),
 		Query: query,
@@ -195,6 +197,7 @@ func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilde
 		}
 		netRb[j] = existing[i]
 		j++
+
 	}
 
 	if len(netIDs) == 0 {

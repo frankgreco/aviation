@@ -3,14 +3,17 @@ ALTER SCHEMA aviation OWNER TO "frank.greco";
 
 DROP TABLE IF EXISTS aviation.registration;
 CREATE TABLE IF NOT EXISTS aviation.registration (
-    unique_id           text PRIMARY KEY NOT NULL,
-    id                  text,
-    serial_number       text,
-    year_manufactured   text,
-    manufacturer        text,
-    model               text,
-    series              text,
-    created             timestamp without time zone
+    unique_id               text PRIMARY KEY NOT NULL,
+    id                      text,
+    serial_number           text,
+    year_manufactured       text,
+    manufacturer            text,
+    model                   text,
+    series                  text,
+    registrant_type         text,
+    registrant_name         text,
+    fractional_ownership    text
+    created                 timestamp without time zone
 );
 ALTER TABLE aviation.registration OWNER TO "frank.greco";
 

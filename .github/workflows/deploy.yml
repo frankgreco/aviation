@@ -21,7 +21,7 @@ jobs:
     - name: build load
       run: cd load && go build ./...
     - name: deploy
-      run: export RDS_USERNAME="${{ secrets.RDS_USERNAME }}" && export RDS_PASSWORD="${{ secrets.RDS_PASSWORD }}" && export RDS_ENDPOINT="${{ secrets.RDS_ENDPOINT }}" && make deploy
+      run: make deploy
       env: 
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

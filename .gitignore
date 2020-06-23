@@ -5,3 +5,5 @@ package.yml
 main
 bin/
 *.tmp
+download/download 
+load/load

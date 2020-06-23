@@ -19,8 +19,7 @@ deploy:
 		--template $(AWS_TEMPLATE) \
 		--stack-name $(AWS_STACK_NAME) \
 		--s3-bucket $(AWS_BUCKET_NAME) \
-		--capabilities CAPABILITY_NAMED_IAM \
-		--parameter-overrides "RdsUsername=$(RDS_USERNAME),RdsPassword=$(RDS_PASSWORD),RdsEndpoint=$(RDS_ENDPOINT)"
+		--capabilities CAPABILITY_NAMED_IAM 
 
 .PHONY: describe
 describe:

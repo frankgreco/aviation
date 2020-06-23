@@ -54,4 +54,4 @@ fmt:
 
 .PHONY: binary
 binary:
-	@GOOS=linux GO111MODULE=on go build -o bin/$(GO_BINARY) ./$(GO_BINARY)
+	@GOOS=linux GO111MODULE=on go build -o aviation_bins/$(GO_BINARY) ./$(GO_BINARY)

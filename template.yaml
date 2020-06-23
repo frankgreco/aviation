@@ -7,7 +7,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: go1.x
-            Handler: main
+            Handler: aviation_bins/download
             Timeout: 300
             CodeUri: .
             MemorySize: 2048

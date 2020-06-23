@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
@@ -34,6 +35,11 @@ func main() {
 	}
 	defer dbase.Close()
 
+	now := time.Now().UTC()
+	log.WithFields(log.Fields{
+		"time": now,
+	}).Info("now")
+
 	var wg sync.WaitGroup
 
 	wg.Add(2)
@@ -43,6 +49,7 @@ func main() {
 		if err := process(
 			"registrations",
 			"master.txt",
+			now,
 			dbase,
 			func(items []api.RowBuilder) squirrel.SelectBuilder {
 				return psq.
@@ -54,7 +61,7 @@ func main() {
 					}).
 					OrderBy("sub.id ASC")
 			},
-			psq.Insert("aviation.registration").Columns(strings.Join((api.Registration{}).Columns(), ", ")),
+			psq.Insert("aviation.registration").Columns(strings.Join(append((api.Registration{}).Columns(), "created"), ", ")),
 			func(data string) api.RowBuilder {
 				return api.NewRegistration(data)
 			},
@@ -73,6 +80,7 @@ func main() {
 		if err := process(
 			"aircraft",
 			"aircraft.txt",
+			now,
 			dbase,
 			func(items []api.RowBuilder) squirrel.SelectBuilder {
 				return psq.
@@ -84,7 +92,7 @@ func main() {
 					}).
 					OrderBy("id ASC")
 			},
-			psq.Insert("aviation.aircraft").Columns(strings.Join((api.Aircraft{}).Columns(), ", ")),
+			psq.Insert("aviation.aircraft").Columns(strings.Join(append((api.Aircraft{}).Columns(), "created"), ", ")),
 			func(data string) api.RowBuilder {
 				return api.NewAircraft(data)
 			},
@@ -99,7 +107,7 @@ func main() {
 	wg.Wait()
 }
 
-func process(resource, fileLocation string, dbase *db.DB, diffQuery func([]api.RowBuilder) squirrel.SelectBuilder, insertQuery squirrel.InsertBuilder, f func(string) api.RowBuilder) error {
+func process(resource, fileLocation string, now time.Time, dbase *db.DB, diffQuery func([]api.RowBuilder) squirrel.SelectBuilder, insertQuery squirrel.InsertBuilder, f func(string) api.RowBuilder) error {
 	file, err := os.Open(fileLocation)
 	if err != nil {
 		return err
@@ -113,6 +121,7 @@ func process(resource, fileLocation string, dbase *db.DB, diffQuery func([]api.R
 		150,
 		insertQuery,
 		new(resource, items, diffQuery(items), dbase),
+		now,
 	)...)
 	return err
 }
@@ -196,7 +205,7 @@ func unmarshal(r io.Reader, f func(string) api.RowBuilder) []api.RowBuilder {
 	return data
 }
 
-func buildQueries(resource string, batchSize int, base squirrel.InsertBuilder, items []api.RowBuilder) []db.QueryScan {
+func buildQueries(resource string, batchSize int, base squirrel.InsertBuilder, items []api.RowBuilder, now time.Time) []db.QueryScan {
 	queries := make([]db.QueryScan, int(math.Ceil(float64(len(items)/batchSize)))+1)
 	remaining := len(items)
 	i, j := 0, 0
@@ -206,7 +215,7 @@ func buildQueries(resource string, batchSize int, base squirrel.InsertBuilder, i
 		query := base
 
 		for _, item := range items[i : i+size] {
-			query = query.Values(item.Values()...)
+			query = query.Values(append(item.Values(), now)...)
 		}
 		queries[j] = db.QueryScan{
 			Name:  fmt.Sprintf("inserting %s [%d,%d)", resource, i, i+size),

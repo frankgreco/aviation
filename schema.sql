@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS aviation.registration (
     year_manufactured   text,
     manufacturer        text,
     model               text,
-    series              text
+    series              text,
+    created             timestamp without time zone
 );
 ALTER TABLE aviation.registration OWNER TO "frank.greco";
 
@@ -24,6 +25,7 @@ CREATE TABLE IF NOT EXISTS aviation.aircraft (
     num_seats           text,
     weight              text,
     cruising_speed      text,
+    created             timestamp without time zone,
     PRIMARY KEY(manufacturer, model, series)
 );
 ALTER TABLE aviation.aircraft OWNER TO "frank.greco";

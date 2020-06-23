@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
-Parameters:
-    RdsUsername:
-      Type: String
-    RdsPassword:
-        Type: String
-    RdsEndpoint:
-        Type: String
+# Parameters:
+#     RdsUsername:
+#       Type: String
+#     RdsPassword:
+#         Type: String
+#     RdsEndpoint:
+#         Type: String
 
 Description: daily cron job that uploads faa aircraft registration to s3
 Resources:

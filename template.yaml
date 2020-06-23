@@ -1,13 +1,21 @@
 AWSTemplateFormatVersion : '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
+Parameters:
+    RdsUsername:
+      Type: String
+    RdsPassword:
+        Type: String
+    RdsEndpoint:
+        Type: String
+
 Description: daily cron job that uploads faa aircraft registration to s3
 Resources:
     UploadFaaAircraftRegistrationDaily:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: go1.x
-            Handler: aviation_bins/download
+            Handler: bin/download
             Timeout: 300
             CodeUri: .
             MemorySize: 2048
@@ -20,6 +28,35 @@ Resources:
                     Type: Schedule
                     Properties:
                         Schedule: cron(0 6 * * ? *)
+            Tags: 
+                project: aviation
+    UpdateDatabase:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: go1.x
+            Handler: aviation_bins/load
+            Timeout: 300
+            CodeUri: .
+            MemorySize: 2048
+            Environment:
+                Variables:
+                    RDS_USERNAME: !Ref RdsUsername
+                    RDS_PASSWORD: !Ref RdsPassword
+                    RDS_ENDPOINT: !Ref RdsEndpoint
+            Policies:
+            - S3ReadPolicy:
+                BucketName: aircraft-registry
+            Events:
+                Daily:
+                    InvocationLevel:
+                    # I want this to run after the previous lambda finishes
+                    # I can do this through the UI but don't yet know
+                    # how to configure it with this template.
+                    # 
+                    # We'll default to an hour after the previous lambda is invoked.
+                    Type: Schedule
+                    Properties:
+                        Schedule: cron(0 7 * * ? *)
             Tags: 
                 project: aviation
     

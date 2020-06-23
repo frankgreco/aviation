@@ -4,15 +4,18 @@ import (
 	"bufio"
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"math"
+	"os"
 	"sort"
 	"strings"
 	"sync"
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -26,10 +29,24 @@ import (
 
 var (
 	psq   = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
-	dbURL = "postgres:///aviation"
+	dbURL = fmt.Sprintf("postgres://%s:%s@%s:5432/aviation", os.Getenv("RDS_USERNAME"), os.Getenv("RDS_PASSWORD"), os.Getenv("RDS_ENDPOINT"))
 )
 
 func main() {
+	lambda.Start(do)
+
+	// uncomment this code to do a quick test locally without using sam
+
+	// if err := do(context.Background()); err != nil {
+	// 	log.WithFields(log.Fields{
+	// 		"errors": err.Error(),
+	// 	}).Info("routine did not run successfully")
+	// 	os.Exit(1)
+	// }
+}
+
+func do(ctx context.Context) error {
+	log.Info("creating aws session")
 	sesh, err := session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
 			Region: aws.String(aviation.AwsRegion),
@@ -39,14 +56,14 @@ func main() {
 		log.WithFields(log.Fields{
 			"err": err.Error(),
 		}).Error("could not create aws session")
-		panic(err)
+		return err
 	}
 
 	dbase, err := db.New(dbURL, log.New().WithFields(log.Fields{
 		"app": "database",
 	}))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer dbase.Close()
 
@@ -55,8 +72,10 @@ func main() {
 	}).Info("now")
 
 	var wg sync.WaitGroup
-
 	wg.Add(2)
+
+	errChan := make(chan error)
+
 	go func() {
 		defer wg.Done()
 
@@ -85,8 +104,9 @@ func main() {
 				"resource": "registrations",
 				"error":    err.Error(),
 			}).Error("failed to process resource")
+			errChan <- err
 		}
-
+		errChan <- nil
 	}()
 
 	go func() {
@@ -117,10 +137,27 @@ func main() {
 				"resource": "aircraft",
 				"error":    err.Error(),
 			}).Error("failed to process resource")
+			errChan <- err
+		}
+		errChan <- nil
+	}()
+
+	e := []string{}
+	go func() {
+		for range errChan {
+			if err := <-errChan; err != nil {
+				e = append(e, err.Error())
+			}
 		}
 	}()
 
 	wg.Wait()
+	close(errChan)
+
+	if len(e) == 0 {
+		return nil
+	}
+	return errors.New(strings.Join(e, ", "))
 }
 
 func getDataFromS3(file string, sesh *session.Session) (io.ReadCloser, error) {
@@ -149,17 +186,22 @@ func process(resource, fileLocation string, now time.Time, dbase *db.DB, sesh *s
 
 	items := unmarshal(data, f)
 
+	n, err := new(resource, items, diffQuery(items), dbase)
+	if err != nil {
+		return err
+	}
+
 	_, err = dbase.QueryRowsTx(context.Background(), nil, buildQueries(
 		resource,
 		150,
 		insertQuery,
-		new(resource, items, diffQuery(items), dbase),
+		n,
 		now,
 	)...)
 	return err
 }
 
-func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilder, dbase *db.DB) []api.RowBuilder {
+func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilder, dbase *db.DB) ([]api.RowBuilder, error) {
 	netIDs := []string{}
 
 	if _, err := dbase.QueryRowsTx(context.Background(), nil, db.QueryScan{
@@ -183,7 +225,7 @@ func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilde
 		}),
 	}); err != nil && err != db.ErrNotFound {
 		dbase.Close()
-		panic(err)
+		return nil, err
 	}
 
 	netRb := make([]api.RowBuilder, len(netIDs))
@@ -208,7 +250,7 @@ func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilde
 		}).Info(fmt.Sprintf("new %s", resource))
 	}
 
-	return netRb
+	return netRb, nil
 }
 
 func toValues(items []api.RowBuilder) string {

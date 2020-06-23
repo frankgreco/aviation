@@ -13,18 +13,19 @@ PASS      	= $(shell printf "\033[32mPASS\033[0m")
 FAIL      	= $(shell printf "\033[31mFAIL\033[0m")
 COLORIZE   	= sed ''/PASS/s//$(PASS)/'' | sed ''/FAIL/s//$(FAIL)/''
 
-.PHONY: upload
-upload: binary
-	zip $(SERVICE_NAME)-function *
-	aws s3 mv $(SERVICE_NAME)-function.zip s3://$(AWS_BUCKET_NAME)/
+# .PHONY: upload
+# upload: binary
+# 	zip $(SERVICE_NAME)-function aviation_bins/*
+# 	aws s3 mv $(SERVICE_NAME)-function.zip s3://$(AWS_BUCKET_NAME)/
 
 .PHONY: deploy
-deploy: upload
+deploy:
 	sam deploy \
 		--template $(AWS_TEMPLATE) \
 		--stack-name $(AWS_STACK_NAME) \
 		--s3-bucket $(AWS_BUCKET_NAME) \
-		--capabilities CAPABILITY_NAMED_IAM
+		--capabilities CAPABILITY_NAMED_IAM \
+		--parameter-overrides "RdsUsername=$(RDS_USERNAME),RdsPassword=$(RDS_PASSWORD),RdsEndpoint=$(RDS_ENDPOINT)"
 
 .PHONY: describe
 describe:
@@ -54,4 +55,4 @@ fmt:
 
 .PHONY: binary
 binary:
-	@GOOS=linux GO111MODULE=on go build -o aviation_bins/$(GO_BINARY) ./$(GO_BINARY)
+	@GOOS=darwin GO111MODULE=on go build -o bin/$(GO_BINARY) ./$(GO_BINARY)

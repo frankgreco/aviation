@@ -20,7 +20,7 @@ deploy:
 		--stack-name $(AWS_STACK_NAME) \
 		--s3-bucket $(AWS_BUCKET_NAME) \
 		--capabilities CAPABILITY_NAMED_IAM \
-		--parameter-overrides "RdsUsername=$(RDS_USERNAME)" "RdsPassword=$(RDS_PASSWORD)" "RdsEndpoint=$(RDS_ENDPOINT)"
+		--parameter-overrides "RdsUsername=$(RDS_USERNAME)" "RdsPassword=$(RDS_PASSWORD)" "RdsEndpoint=$(RDS_ENDPOINT)" "TwitterAccessSecret=$(TWITTER_ACCESS_SECRET)" "TwitterAccessToken=$(TWITTER_ACCESS_TOKEN)" "TwitterConsumerKey=$(TWITTER_CONSUMER_KEY)" "TwitterConsumerSecret=$(TWITTER_CONSUMER_SECRET)"
 
 .PHONY: describe
 describe:

@@ -20,8 +20,9 @@ jobs:
       run: cd download && go build ./...
     - name: build load
       run: cd load && go build ./...
+    - name: build twitter
+      run: cd twitter && go build ./...
     - name: deploy
-      # run: RDS_USERNAME="${{ secrets.RDS_USERNAME }}" RDS_PASSWORD="${{ secrets.RDS_PASSWORD }}" RDS_ENDPOINT="${{ secrets.RDS_ENDPOINT }}" make deploy
       run: make deploy
       env: 
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -30,3 +31,7 @@ jobs:
         RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
         RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
         RDS_ENDPOINT: ${{ secrets.RDS_ENDPOINT }}
+        TWITTER_ACCESS_SECRET: ${{ secrets.TWITTER_ACCESS_SECRET }}
+        TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
+        TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}

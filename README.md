@@ -41,3 +41,7 @@ The following is an example log after a successful execution
 INFO[0001] new aircraft                                  aircraft=002-09-01
 INFO[0002] new registrations                             registrations=00000000
 ```
+
+## twitter
+
+The twitter app will tweet a summary of all new registrations for that day.

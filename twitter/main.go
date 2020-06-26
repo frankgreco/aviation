@@ -97,7 +97,7 @@ func do(ctx context.Context) error {
 	for _, stuff := range newStuff {
 		_, _, err = client.Statuses.Update(
 			p.Sprintf(
-				"Make: %s\nModel: %s\nSeries: %s\nSerial Number: %s\nOwner: %s\nEngines: %s\nSeats: %s",
+				"Make: %s\nModel: %s\nSeries: %s\nSerial Number: %s\nOwner: %s\nEngines: %d\nSeats: %d",
 				stuff.aircraft.ManufacturerName,
 				stuff.aircraft.ModelName,
 				stuff.aircraft.Series,
@@ -109,8 +109,8 @@ func do(ctx context.Context) error {
 					}
 					return owner
 				}(),
-				strings.TrimLeft(stuff.aircraft.NumEngines, "0"),
-				strings.TrimLeft(stuff.aircraft.NumSeats, "0"),
+				stuff.aircraft.NumEngines,
+				stuff.aircraft.NumSeats,
 			), &twitter.StatusUpdateParams{
 				InReplyToStatusID: tweet.ID,
 			})

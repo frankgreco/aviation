@@ -30,3 +30,14 @@ CREATE TABLE IF NOT EXISTS aviation.aircraft (
     cruising_speed              integer,
     created                     date
 );
+
+DROP TABLE IF EXISTS aviation.engine;
+CREATE TABLE IF NOT EXISTS aviation.engine (
+    id          text PRIMARY KEY NOT NULL,
+    make        text,
+    model       text,
+    type        text,
+    horsepower  integer,
+    thrust      integer,
+    created     date
+);

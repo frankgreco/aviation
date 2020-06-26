@@ -38,8 +38,15 @@ The load app will update a PostgreSQL database every day from the updated FAA da
 
 The following is an example log after a successful execution
 ```
-INFO[0001] new aircraft                                  aircraft=002-09-01
-INFO[0002] new registrations                             registrations=00000000
+INFO[0000] creating aws session
+INFO[0000] successfully created aws session
+INFO[0000] now                                           fields.time="2020-06-25 19:46:52.342048 -0700 PDT m=+0.003518102"
+INFO[0000] no new engines
+WARN[0000] query #0 was not provided                     app=database
+INFO[0002] no new aircraft
+WARN[0002] query #0 was not provided                     app=database
+INFO[0008] no new registrations
+WARN[0008] query #0 was not provided                     app=database
 ```
 
 ## twitter

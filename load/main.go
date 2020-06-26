@@ -73,7 +73,7 @@ func do(ctx context.Context) error {
 	}).Info("now")
 
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(3)
 
 	errChan := make(chan error)
 
@@ -124,6 +124,9 @@ func do(ctx context.Context) error {
 					Select("id").
 					From("aviation.aircraft a").
 					JoinClause(fmt.Sprintf("NATURAL RIGHT JOIN (VALUES %s) AS sub (id)", toValues(items))).
+					Where(squirrel.Eq{
+						"a.id": nil,
+					}).
 					OrderBy("id ASC")
 			},
 			psq.Insert("aviation.aircraft").Columns(strings.Join(append((api.Aircraft{}).Columns(), "created"), ", ")),
@@ -133,6 +136,39 @@ func do(ctx context.Context) error {
 		); err != nil {
 			log.WithFields(log.Fields{
 				"resource": "aircraft",
+				"error":    err.Error(),
+			}).Error("failed to process resource")
+			errChan <- err
+		}
+		errChan <- nil
+	}()
+
+	go func() {
+		defer wg.Done()
+
+		if err := process(
+			"engines",
+			"ENGINE.txt",
+			aviation.Now,
+			dbase,
+			sesh,
+			func(items []api.RowBuilder) squirrel.SelectBuilder {
+				return psq.
+					Select("id").
+					From("aviation.engine e").
+					JoinClause(fmt.Sprintf("NATURAL RIGHT JOIN (VALUES %s) AS sub (id)", toValues(items))).
+					Where(squirrel.Eq{
+						"e.id": nil,
+					}).
+					OrderBy("id ASC")
+			},
+			psq.Insert("aviation.engine").Columns(strings.Join(append((api.Engine{}).Columns(), "created"), ", ")),
+			func(data string) api.RowBuilder {
+				return api.NewEngine(data)
+			},
+		); err != nil {
+			log.WithFields(log.Fields{
+				"resource": "engine",
 				"error":    err.Error(),
 			}).Error("failed to process resource")
 			errChan <- err

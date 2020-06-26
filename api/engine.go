@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Engine struct {
@@ -24,10 +25,11 @@ func (e Engine) Columns() []string {
 		"type",
 		"horsepower",
 		"thrust",
+		"created",
 	}
 }
 
-func (e Engine) Values() []interface{} {
+func (e Engine) Values(now time.Time) []interface{} {
 	return []interface{}{
 		fmt.Sprintf("%s-%s", e.Manufacturer, e.Model),
 		e.ManufacturerName,
@@ -35,15 +37,12 @@ func (e Engine) Values() []interface{} {
 		e.Type.String(),
 		e.Horsepower,
 		e.Thrust,
+		now.UTC(),
 	}
 }
 
 func (e Engine) ID() string {
 	return fmt.Sprintf("%s-%s", e.Manufacturer, e.Model)
-}
-
-func (reg Engine) DBValue() string {
-	return fmt.Sprintf("('%s')", reg.ID())
 }
 
 func NewEngine(data string) Engine {

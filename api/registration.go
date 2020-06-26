@@ -1,8 +1,8 @@
 package api
 
 import (
-	"fmt"
 	"strings"
+	"time"
 )
 
 type Address struct {
@@ -51,10 +51,6 @@ func (reg Registration) ID() string {
 	return reg.UniqueID
 }
 
-func (reg Registration) DBValue() string {
-	return fmt.Sprintf("('%s')", reg.ID())
-}
-
 func (reg *Registration) Unmarshal(data string) RowBuilder {
 	return NewRegistration(data)
 }
@@ -71,10 +67,11 @@ func (ac Registration) Columns() []string {
 		"registrant_type",
 		"registrant_name",
 		"fractional_ownership",
+		"created",
 	}
 }
 
-func (reg Registration) Values() []interface{} {
+func (reg Registration) Values(now time.Time) []interface{} {
 	return []interface{}{
 		reg.UniqueID,
 		reg.Id,
@@ -86,6 +83,7 @@ func (reg Registration) Values() []interface{} {
 		reg.RegistrantType,
 		reg.RegistrantName,
 		reg.FractionalOwnership,
+		now.UTC(),
 	}
 }
 

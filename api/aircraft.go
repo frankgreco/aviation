@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/frankgreco/aviation/utils/db"
 )
@@ -160,10 +161,11 @@ func (ac Aircraft) Columns() []string {
 		"num_seats",
 		"weight",
 		"cruising_speed",
+		"created",
 	}
 }
 
-func (ac Aircraft) Values() []interface{} {
+func (ac Aircraft) Values(now time.Time) []interface{} {
 	return []interface{}{
 		fmt.Sprintf("%s-%s-%s", ac.Manufacturer, ac.Model, ac.Series),
 		ac.ManufacturerName,
@@ -176,6 +178,7 @@ func (ac Aircraft) Values() []interface{} {
 		db.NullInt(ac.NumSeats),
 		ac.Weight,
 		db.NullInt(ac.CruisingSpeed),
+		now.UTC(),
 	}
 }
 
@@ -213,10 +216,6 @@ func (ac BuilderCertificationCode) String() string {
 
 func (reg Aircraft) ID() string {
 	return fmt.Sprintf("%s-%s-%s", reg.Manufacturer, reg.Model, reg.Series)
-}
-
-func (reg Aircraft) DBValue() string {
-	return fmt.Sprintf("('%s')", reg.ID())
 }
 
 func (reg *Aircraft) Unmarshal(data string) RowBuilder {

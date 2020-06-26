@@ -96,7 +96,7 @@ func do(ctx context.Context) error {
 					}).
 					OrderBy("sub.id ASC")
 			},
-			psq.Insert("aviation.registration").Columns(strings.Join(append((api.Registration{}).Columns(), "created"), ", ")),
+			psq.Insert("aviation.registration").Columns(strings.Join((api.Registration{}).Columns(), ", ")),
 			func(data string) api.RowBuilder {
 				return api.NewRegistration(data)
 			},
@@ -129,7 +129,7 @@ func do(ctx context.Context) error {
 					}).
 					OrderBy("id ASC")
 			},
-			psq.Insert("aviation.aircraft").Columns(strings.Join(append((api.Aircraft{}).Columns(), "created"), ", ")),
+			psq.Insert("aviation.aircraft").Columns(strings.Join((api.Aircraft{}).Columns(), ", ")),
 			func(data string) api.RowBuilder {
 				return api.NewAircraft(data)
 			},
@@ -162,7 +162,7 @@ func do(ctx context.Context) error {
 					}).
 					OrderBy("id ASC")
 			},
-			psq.Insert("aviation.engine").Columns(strings.Join(append((api.Engine{}).Columns(), "created"), ", ")),
+			psq.Insert("aviation.engine").Columns(strings.Join((api.Engine{}).Columns(), ", ")),
 			func(data string) api.RowBuilder {
 				return api.NewEngine(data)
 			},
@@ -295,7 +295,7 @@ func toValues(items []api.RowBuilder) string {
 	values := []string{}
 
 	for _, item := range items {
-		values = append(values, item.DBValue())
+		values = append(values, fmt.Sprintf("('%s')", item.ID()))
 	}
 
 	return strings.Join(values, ", ")
@@ -325,7 +325,7 @@ func buildQueries(resource string, batchSize int, base squirrel.InsertBuilder, i
 		query := base
 
 		for _, item := range items[i : i+size] {
-			query = query.Values(append(item.Values(), now.UTC())...)
+			query = query.Values(item.Values(now)...)
 		}
 		queries[j] = db.QueryScan{
 			Name:  fmt.Sprintf("inserting %s [%d,%d)", resource, i, i+size),

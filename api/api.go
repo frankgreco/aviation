@@ -1,10 +1,11 @@
 package api
 
+import "time"
+
 type RowBuilder interface {
 	Columns() []string
-	Values() []interface{}
+	Values(time.Time) []interface{}
 	ID() string
-	DBValue() string
 }
 
 type Unmarshaler interface {

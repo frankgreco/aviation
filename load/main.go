@@ -121,12 +121,9 @@ func do(ctx context.Context) error {
 			sesh,
 			func(items []api.RowBuilder) squirrel.SelectBuilder {
 				return psq.
-					Select("sub.manufacturer || '-' ||  sub.model || '-' || sub.series as id").
+					Select("id").
 					From("aviation.aircraft a").
-					JoinClause(fmt.Sprintf("NATURAL RIGHT JOIN (VALUES %s) AS sub (manufacturer, model, series)", toValues(items))).
-					Where(squirrel.Eq{
-						"a.manufactuer_name": nil,
-					}).
+					JoinClause(fmt.Sprintf("NATURAL RIGHT JOIN (VALUES %s) AS sub (id)", toValues(items))).
 					OrderBy("id ASC")
 			},
 			psq.Insert("aviation.aircraft").Columns(strings.Join(append((api.Aircraft{}).Columns(), "created"), ", ")),

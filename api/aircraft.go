@@ -149,11 +149,9 @@ type Aircraft struct {
 
 func (ac Aircraft) Columns() []string {
 	return []string{
-		"manufacturer",
+		"id",
+		"make",
 		"model",
-		"series",
-		"manufactuer_name",
-		"model_name",
 		"type",
 		"engine_type",
 		"category_code",
@@ -167,9 +165,7 @@ func (ac Aircraft) Columns() []string {
 
 func (ac Aircraft) Values() []interface{} {
 	return []interface{}{
-		ac.Manufacturer,
-		ac.Model,
-		ac.Series,
+		fmt.Sprintf("%s-%s-%s", ac.Manufacturer, ac.Model, ac.Series),
 		ac.ManufacturerName,
 		ac.ModelName,
 		ac.Type.String(),
@@ -220,7 +216,7 @@ func (reg Aircraft) ID() string {
 }
 
 func (reg Aircraft) DBValue() string {
-	return fmt.Sprintf("('%s', '%s', '%s')", reg.Manufacturer, reg.Model, reg.Series)
+	return fmt.Sprintf("('%s')", reg.ID())
 }
 
 func (reg *Aircraft) Unmarshal(data string) RowBuilder {

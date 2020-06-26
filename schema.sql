@@ -1,5 +1,4 @@
 CREATE SCHEMA IF NOT EXISTS aviation;
-ALTER SCHEMA aviation OWNER TO "frank.greco";
 
 DROP TABLE IF EXISTS aviation.registration;
 CREATE TABLE IF NOT EXISTS aviation.registration (
@@ -15,20 +14,22 @@ CREATE TABLE IF NOT EXISTS aviation.registration (
     fractional_ownership    text
     created                 timestamp without time zone
 );
-ALTER TABLE aviation.registration OWNER TO "frank.greco";
 
 DROP TABLE IF EXISTS aviation.aircraft;
 CREATE TABLE IF NOT EXISTS aviation.aircraft (
-    manufacturer        text NOT NULL,
-    model               text,
-    series              text,
-    manufactuer_name    text,
-    model_name          text,
-    num_engines         text,
-    num_seats           text,
-    weight              text,
-    cruising_speed      text,
-    created             timestamp without time zone,
+    manufacturer                text NOT NULL,
+    model                       text,
+    series                      text,
+    manufactuer_name            text,
+    model_name                  text,
+    type                        text,
+    engine_type                 text,
+    category_code               text,
+    builder_certification_code  text,
+    num_engines                 integer,
+    num_seats                   integer,
+    weight                      text,
+    cruising_speed              integer,
+    created                     date,
     PRIMARY KEY(manufacturer, model, series)
 );
-ALTER TABLE aviation.aircraft OWNER TO "frank.greco";

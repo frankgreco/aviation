@@ -235,6 +235,17 @@ func NullString(s string) sql.NullString {
 	}
 }
 
+// NullInt is a helper for inserting a int which can be null.
+func NullInt(s int) sql.NullInt64 {
+	if s == 0 {
+		return sql.NullInt64{}
+	}
+	return sql.NullInt64{
+		Int64: int64(s),
+		Valid: true,
+	}
+}
+
 // NullBoolP is a helper for inserting a pointer to a bool which can be null.
 func NullBoolP(b *bool) sql.NullBool {
 	if b == nil {

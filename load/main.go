@@ -15,7 +15,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/aws/aws-lambda-go/lambda"
+	//"github.com/aws/aws-lambda-go/lambda"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -33,16 +34,16 @@ var (
 )
 
 func main() {
-	lambda.Start(do)
+	//lambda.Start(do)
 
 	// uncomment this code to do a quick test locally without using sam
 	//
-	// if err := do(context.Background()); err != nil {
-	// 	log.WithFields(log.Fields{
-	// 		"errors": err.Error(),
-	// 	}).Info("routine did not run successfully")
-	// 	os.Exit(1)
-	// }
+	if err := do(context.Background()); err != nil {
+		log.WithFields(log.Fields{
+			"errors": err.Error(),
+		}).Info("routine did not run successfully")
+		os.Exit(1)
+	}
 }
 
 func do(ctx context.Context) error {

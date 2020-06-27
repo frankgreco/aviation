@@ -3,7 +3,9 @@ package api
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +16,7 @@ import (
 type Classification int32
 type StatusCode int32
 type ApprovedOperation int32
+type RegistrantType int32
 
 const (
 	Classification_Standard Classification = iota
@@ -114,9 +117,40 @@ const (
 	ApprovedOperation_LighterThanAir
 	ApprovedOperation_PowerParachute
 	ApprovedOperation_WeightShiftControl
+
+	RegistrantType_Individual RegistrantType = iota
+	RegistrantType_Partnership
+	RegistrantType_Corporation
+	RegistrantType_CoOwned
+	RegistrantType_Government
+	RegistrantType_LLC
+	RegistrantType_NonCitizenCorporation
+	RegistrantType_NonCitizenCoOwned
+	RegistrantType_Unknown
 )
 
 var (
+	RegistrantType_name = map[string]RegistrantType{
+		"1": RegistrantType_Individual,
+		"2": RegistrantType_Partnership,
+		"3": RegistrantType_Corporation,
+		"4": RegistrantType_CoOwned,
+		"5": RegistrantType_Government,
+		"7": RegistrantType_LLC,
+		"8": RegistrantType_NonCitizenCorporation,
+		"9": RegistrantType_NonCitizenCoOwned,
+	}
+	RegistrantType_value = map[RegistrantType]string{
+		RegistrantType_Individual:            "INDIVIDUAL",
+		RegistrantType_Partnership:           "PARTNERSHIP",
+		RegistrantType_Corporation:           "CORPORATION",
+		RegistrantType_CoOwned:               "CO_OWNED",
+		RegistrantType_Government:            "GOVERNMENT",
+		RegistrantType_LLC:                   "LLC",
+		RegistrantType_NonCitizenCorporation: "NON_CITIZEN_CORPORATION",
+		RegistrantType_NonCitizenCoOwned:     "NON_CITIZEN_CO_OWNED",
+		RegistrantType_Unknown:               "UNKNOWN",
+	}
 	Classification_name = map[string]Classification{
 		"1": Classification_Standard,
 		"2": Classification_Limited,
@@ -360,55 +394,14 @@ type Address struct {
 	Country string `json:"country"`
 }
 
-func (ac Classification) String() string {
-	val, ok := Classification_value[ac]
-	if !ok {
-		return "UNKNOWN"
-	}
-	return val
-}
-
-func (ac ApprovedOperation) String() string {
-	val, ok := ApprovedOperations_value[ac]
-	if !ok {
-		return "UNKNOWN"
-	}
-	return val
-}
-
-func (ac StatusCode) String() string {
-	val, ok := StatusCode_value[ac]
-	if !ok {
-		return "UNKNOWN"
-	}
-	return val
-}
-
-func (s Address) Value() (driver.Value, error) {
-	return json.Marshal(s)
-}
-
 type Kit struct {
 	Manufacturer string `json:"manufacturer"`
 	Model        string `json:"model"`
 }
 
-func (s Kit) Value() (driver.Value, error) {
-	return json.Marshal(s)
-}
-
-type CertificationUses struct {
-	AirworthinessClassificationCode string
-	ApprovedOperationCodes          string
-}
-
 type Registrant struct {
-	Type string `json:"type"`
-	Name string `json:"name"`
-}
-
-func (s Registrant) Value() (driver.Value, error) {
-	return json.Marshal(s)
+	Type RegistrantType `json:"type"`
+	Name string         `json:"name"`
 }
 
 type Registration struct {
@@ -442,66 +435,133 @@ type Registration struct {
 	Kit                      *Kit
 }
 
+func (ac Classification) String() string {
+	val, ok := Classification_value[ac]
+	if !ok {
+		return "UNKNOWN"
+	}
+	return val
+}
+
+func (ac ApprovedOperation) String() string {
+	val, ok := ApprovedOperations_value[ac]
+	if !ok {
+		return "UNKNOWN"
+	}
+	return val
+}
+
+func (ac StatusCode) String() string {
+	val, ok := StatusCode_value[ac]
+	if !ok {
+		return "UNKNOWN"
+	}
+	return val
+}
+
+func (s Address) Value() (driver.Value, error) {
+	return json.Marshal(s)
+}
+
+func (s RegistrantType) MarshalJSON() ([]byte, error) {
+	registrantType, ok := RegistrantType_value[s]
+	if !ok {
+		return nil, errors.New("unknown registrant type")
+	}
+	return []byte(fmt.Sprintf("\"%s\"", registrantType)), nil
+}
+
+func (s Kit) Value() (driver.Value, error) {
+	return json.Marshal(s)
+}
+
+func (s Registrant) Value() (driver.Value, error) {
+	return json.Marshal(s)
+}
+
 func (reg Registration) ID() string {
 	return reg.UniqueID
 }
 
-func (reg Registration) GetGetGetApprovedOperations() []string {
+func (reg Registration) GetApprovedOperations() []string {
+	toReturn := []string{}
+
 	switch reg.Classification {
 	case Classification_Standard:
-		if reg.ApprovedOperations == "" {
-			return []string{}
+		if reg.ApprovedOperations != "" {
+			val, ok := ApprovedOperations_name[Classification_Standard][reg.ApprovedOperations[0:1]]
+			if ok {
+				toReturn = append(toReturn, val.String())
+			}
 		}
-		val, ok := ApprovedOperations_name[Classification_Standard][reg.ApprovedOperations[0:1]]
-		if !ok {
-			return []string{}
-		}
-		return []string{val.String()}
 	case Classification_Limited, Classification_Primary:
-		return []string{}
 	case Classification_Restricted:
-		tmp := []string{}
-
-		if reg.ApprovedOperations == "" {
-			return tmp
-		}
-
 		for _, op := range reg.ApprovedOperations {
 			val, ok := ApprovedOperations_name[Classification_Restricted][fmt.Sprintf("%c", op)]
 			if !ok {
 				continue
 			}
-			tmp = append(tmp, val.String())
+			toReturn = append(toReturn, val.String())
 		}
-
-		return tmp
 	case Classification_Experimental:
-		return []string{}
+		i := 0
+		for i < len(reg.ApprovedOperations) {
+			var key string
+			if (reg.ApprovedOperations[i] == '8' || reg.ApprovedOperations[i] == '9') && len(reg.ApprovedOperations) >= i+2 {
+				key = reg.ApprovedOperations[i : i+2]
+				i += 2
+			} else {
+				key = fmt.Sprintf("%c", reg.ApprovedOperations[i:i+1])
+				i++
+			}
+			val, ok := ApprovedOperations_name[Classification_Experimental][key]
+			if ok {
+				toReturn = append(toReturn, val.String())
+			}
+		}
 	case Classification_Provisional:
-		if reg.ApprovedOperations == "" {
-			return []string{}
+		if reg.ApprovedOperations != "" {
+			val, ok := ApprovedOperations_name[Classification_Provisional][reg.ApprovedOperations[0:1]]
+			if !ok {
+				return toReturn
+			}
+			toReturn = append(toReturn, val.String())
 		}
-		val, ok := ApprovedOperations_name[Classification_Provisional][reg.ApprovedOperations[0:1]]
-		if !ok {
-			return []string{}
-		}
-		return []string{val.String()}
 	case Classification_Multiple:
-		return []string{}
+		switch l := len(reg.ApprovedOperations); {
+		case l > 0:
+			left := math.Min(2.0, float64(len(reg.ApprovedOperations)))
+			for _, op := range reg.ApprovedOperations[:int(left)] {
+				val, ok := ApprovedOperations_name[Classification_Multiple][fmt.Sprintf("P1_%c", op)]
+				if ok {
+					toReturn = append(toReturn, val.String())
+				}
+			}
+			fallthrough
+		case l > 2:
+			for _, op := range reg.ApprovedOperations[2:] {
+				val, ok := ApprovedOperations_name[Classification_Multiple][fmt.Sprintf("P2_%c", op)]
+				if ok {
+					toReturn = append(toReturn, val.String())
+				}
+			}
+		}
 	case Classification_SpecialFlightPermit:
-		return []string{}
+		for _, op := range reg.ApprovedOperations {
+			val, ok := ApprovedOperations_name[Classification_SpecialFlightPermit][fmt.Sprintf("%c", op)]
+			if ok {
+				toReturn = append(toReturn, val.String())
+			}
+		}
 	case Classification_LightSport:
-		if reg.ApprovedOperations == "" {
-			return []string{}
+		if reg.ApprovedOperations != "" {
+			val, ok := ApprovedOperations_name[Classification_LightSport][reg.ApprovedOperations[0:1]]
+			if ok {
+				toReturn = append(toReturn, val.String())
+			}
 		}
-		val, ok := ApprovedOperations_name[Classification_LightSport][reg.ApprovedOperations[0:1]]
-		if !ok {
-			return []string{}
-		}
-		return []string{val.String()}
-	default:
-		return []string{}
 	}
+	return toReturn
 }
 
 func (reg *Registration) Unmarshal(data string) RowBuilder {
@@ -561,7 +621,7 @@ func (reg Registration) Values(now time.Time) []interface{} {
 		reg.LastActivityDate,
 		reg.CertificationIssueDate,
 		reg.Classification.String(),
-		pq.Array(reg.GetGetGetApprovedOperations()),
+		pq.Array(reg.GetApprovedOperations()),
 		reg.AircraftType.String(),
 		reg.EngineType.String(),
 		reg.StatusCode.String(),
@@ -636,6 +696,11 @@ func NewRegistration(data string) Registration {
 		statusCode = StatusCode_Unknown
 	}
 
+	registrantType, ok := RegistrantType_name[strings.TrimSpace(data[56:57])]
+	if !ok {
+		registrantType = RegistrantType_Unknown
+	}
+
 	var kit *Kit
 	{
 		manufacturer := strings.TrimSpace(data[549:579])
@@ -658,7 +723,7 @@ func NewRegistration(data string) Registration {
 		EngineModelCode:          strings.TrimSpace(data[48:50]),
 		YearManufactured:         strings.TrimSpace(data[51:55]),
 		Registrant: &Registrant{
-			Type: strings.TrimSpace(data[56:57]),
+			Type: registrantType,
 			Name: strings.TrimSpace(data[58:108]),
 		},
 		Address: &Address{

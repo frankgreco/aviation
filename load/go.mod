@@ -8,6 +8,7 @@ require (
 	github.com/frankgreco/aviation/api v0.0.0
 	github.com/frankgreco/aviation/utils v0.0.0-20200624030258-6c014fac6407
 	github.com/jmoiron/sqlx v1.2.0
+	github.com/lib/pq v1.7.0 // indirect
 	github.com/sirupsen/logrus v1.6.0
 )
 

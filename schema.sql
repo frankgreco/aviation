@@ -2,17 +2,28 @@ CREATE SCHEMA IF NOT EXISTS aviation;
 
 DROP TABLE IF EXISTS aviation.registration;
 CREATE TABLE IF NOT EXISTS aviation.registration (
-    unique_id               text PRIMARY KEY NOT NULL,
-    id                      text,
+    id                      text PRIMARY KEY NOT NULL,
+    tail_number             text,
     serial_number           text,
     year_manufactured       text,
-    manufacturer            text,
-    model                   text,
-    series                  text,
-    registrant_type         text,
-    registrant_name         text,
-    fractional_ownership    text
-    created                 timestamp without time zone
+    aircraft_id             text,
+    registrant              jsonb,
+    address                 jsonb,
+    last_activity_date      date,
+    certificate_issue_date  date,
+    classification          text,
+    approved_operations     text[],
+    type                    text,
+    engine_type             text,
+    status_code             text,
+    model_s_code            text,
+    is_fractionally_owned   boolean,
+    airworthiness_date      date,
+    other_names             text[],
+    expiration_date         date,
+    kit                     jsonb,
+    created                 date
+    -- CONSTRAINT aircraft_id_fkey FOREIGN KEY (aircraft_id) REFERENCES aviation.aircraft (id)
 );
 
 DROP TABLE IF EXISTS aviation.aircraft;

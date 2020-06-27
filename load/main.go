@@ -90,9 +90,9 @@ func do(ctx context.Context) error {
 				return psq.
 					Select("sub.id").
 					From("aviation.registration r").
-					JoinClause(fmt.Sprintf("RIGHT JOIN (VALUES %s) AS sub (id) ON sub.id = r.unique_id", toValues(items))).
+					JoinClause(fmt.Sprintf("RIGHT JOIN (VALUES %s) AS sub (id) ON sub.id = r.id", toValues(items))).
 					Where(squirrel.Eq{
-						"r.unique_id": nil,
+						"r.id": nil,
 					}).
 					OrderBy("sub.id ASC")
 			},

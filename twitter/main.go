@@ -53,11 +53,11 @@ func do(ctx context.Context) error {
 
 	if _, err := dbase.QueryRowsTx(context.Background(), nil, db.QueryScan{
 		Name: "retrieve all new registrations",
-		Query: psq.Select("a.manufactuer_name, a.model_name, a.series, r.serial_number, r.year_manufactured, r.registrant_name, a.num_engines, a.num_seats, a.weight, a.cruising_speed").
+		Query: psq.Select("a.make, a.model, a.series, r.serial_number, r.year_manufactured, r.registrant->>'name', a.num_engines, a.num_seats, a.weight, a.cruising_speed").
 			From("aviation.registration r").
-			JoinClause("NATURAL JOIN aviation.aircraft a").
+			Join("aviation.aircraft a ON a.id = r.aircraft_id").
 			Where(squirrel.Eq{
-				"created::date": aviation.Date,
+				"created": aviation.Date,
 			}),
 		Callback: db.ScanFunc(func(rows *sqlx.Rows) (arr []interface{}, err error) {
 			for {
@@ -65,7 +65,8 @@ func do(ctx context.Context) error {
 					aircraft     api.Aircraft
 					registration api.Registration
 				}
-				if err = rows.Scan(&stuff.aircraft.ManufacturerName, &stuff.aircraft.ModelName, &stuff.aircraft.Series, &stuff.registration.SerialNumber, &stuff.registration.YearManufactured, &stuff.registration.RegistrantName, &stuff.aircraft.NumEngines, &stuff.aircraft.NumSeats, &stuff.aircraft.Weight, &stuff.aircraft.CruisingSpeed); err == sql.ErrNoRows {
+				stuff.registration.Registrant = new(api.Registrant)
+				if err = rows.Scan(&stuff.aircraft.Manufacturer, &stuff.aircraft.Model, &stuff.aircraft.Series, &stuff.registration.SerialNumber, &stuff.registration.YearManufactured, &stuff.registration.Registrant.Name, &stuff.aircraft.NumEngines, &stuff.aircraft.NumSeats, &stuff.aircraft.Weight, &stuff.aircraft.CruisingSpeed); err == sql.ErrNoRows {
 					return nil, nil
 				}
 				if err != nil {
@@ -103,7 +104,7 @@ func do(ctx context.Context) error {
 				stuff.aircraft.Series,
 				stuff.registration.SerialNumber,
 				func() string {
-					owner := strings.Title(strings.ToLower(stuff.registration.RegistrantName))
+					owner := strings.Title(strings.ToLower(stuff.registration.Registrant.Name))
 					if owner == "" {
 						return "unknown"
 					}

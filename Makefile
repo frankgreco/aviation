@@ -54,4 +54,4 @@ binary:
 
 .PHONY: ui
 ui:
-	aws s3 cp ui/dist/* s3://aviation-website/
+	aws s3 cp ui/dist/ s3://aviation-website/

@@ -14,13 +14,13 @@ FAIL      	= $(shell printf "\033[31mFAIL\033[0m")
 COLORIZE   	= sed ''/PASS/s//$(PASS)/'' | sed ''/FAIL/s//$(FAIL)/''
 
 .PHONY: deploy
-deploy:
+deploy: 
 	sam deploy \
 		--template $(AWS_TEMPLATE) \
 		--stack-name $(AWS_STACK_NAME) \
 		--s3-bucket $(AWS_BUCKET_NAME) \
 		--capabilities CAPABILITY_NAMED_IAM \
-		--parameter-overrides "RdsUsername=$(RDS_USERNAME)" "RdsPassword=$(RDS_PASSWORD)" "RdsEndpoint=$(RDS_ENDPOINT)" "TwitterAccessSecret=$(TWITTER_ACCESS_SECRET)" "TwitterAccessToken=$(TWITTER_ACCESS_TOKEN)" "TwitterConsumerKey=$(TWITTER_CONSUMER_KEY)" "TwitterConsumerSecret=$(TWITTER_CONSUMER_SECRET)"
+		--parameter-overrides "RdsUsername=$(RDS_USERNAME)" "RdsPassword=$(RDS_PASSWORD)" "RdsEndpoint=$(RDS_ENDPOINT)"
 
 .PHONY: describe
 describe:
@@ -51,3 +51,7 @@ fmt:
 .PHONY: binary
 binary:
 	@GOOS=linux GO111MODULE=on go build -o bin/$(GO_BINARY) ./$(GO_BINARY)
+
+.PHONY: ui
+ui:
+	aws s3 cp ui/dist/* s3://aviation-website/

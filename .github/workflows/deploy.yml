@@ -20,8 +20,8 @@ jobs:
       run: cd download && go build ./...
     - name: build load
       run: cd load && go build ./...
-    - name: build twitter
-      run: cd twitter && go build ./...
+    - name: build query
+      run: cd query && go build ./...
     - name: deploy
       run: make deploy
       env: 
@@ -35,3 +35,15 @@ jobs:
         TWITTER_ACCESS_TOKEN: ${{ secrets.TWITTER_ACCESS_TOKEN }}
         TWITTER_CONSUMER_KEY: ${{ secrets.TWITTER_CONSUMER_KEY }}
         TWITTER_CONSUMER_SECRET: ${{ secrets.TWITTER_CONSUMER_SECRET }}
+    - name: node
+      uses: actions/setup-node@v1
+      with:
+        node-version: v14.5.0
+    - name: build ui
+      run: cd ui && npm i --production && npm run build
+    - name: deploy website
+      run: make ui
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-west-2

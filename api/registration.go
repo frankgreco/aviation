@@ -471,12 +471,27 @@ func (s RegistrantType) MarshalJSON() ([]byte, error) {
 	return []byte(fmt.Sprintf("\"%s\"", registrantType)), nil
 }
 
+// func (c *RegistrantType) UnmarshalJSON(val []byte) error {
+// 	normalized := utilv1.UnwrapQuotes(strings.ToUpper(string(val)))
+
+// 	i, ok := NetworkType_value[normalized]
+// 	if !ok {
+// 		return fmt.Errorf("%s is invalid", normalized)
+// 	}
+// 	*c = NetworkType(i)
+// 	return nil
+// }
+
 func (s Kit) Value() (driver.Value, error) {
 	return json.Marshal(s)
 }
 
 func (s Registrant) Value() (driver.Value, error) {
 	return json.Marshal(s)
+}
+
+func (s *Registrant) Scan(val interface{}) error {
+	return json.Unmarshal(val.([]byte), s)
 }
 
 func (reg Registration) ID() string {

@@ -8,17 +8,28 @@ Parameters:
         Type: String
     RdsEndpoint:
         Type: String
-    TwitterAccessSecret:
-        Type: String
-    TwitterAccessToken:
-        Type: String
-    TwitterConsumerKey:
-        Type: String
-    TwitterConsumerSecret:
-        Type: String
 
 Description: daily cron job that uploads faa aircraft registration to s3
 Resources:
+    SearchService:
+        Type: AWS::Serverless::Function
+        Tags: 
+            project: aviation
+        Properties:
+            Runtime: go1.x
+            Handler: query/query
+            Environment:
+                Variables:
+                    RDS_USERNAME: !Ref RdsUsername
+                    RDS_PASSWORD: !Ref RdsPassword
+                    RDS_ENDPOINT: !Ref RdsEndpoint
+            CodeUri: .
+            Events:
+                Search:
+                    Type: Api
+                    Properties:
+                        Path: /search
+                        Method: GET
     UploadFaaAircraftRegistrationDaily:
         Type: AWS::Serverless::Function
         Properties:
@@ -67,37 +78,3 @@ Resources:
                         Schedule: cron(0 7 * * ? *)
             Tags: 
                 project: aviation
-    TwitterBot:
-        Type: AWS::Serverless::Function
-        Properties:
-            Runtime: go1.x
-            Handler: twitter/twitter
-            Timeout: 300
-            CodeUri: .
-            MemorySize: 2048
-            Environment:
-                Variables:
-                    RDS_USERNAME: !Ref RdsUsername
-                    RDS_PASSWORD: !Ref RdsPassword
-                    RDS_ENDPOINT: !Ref RdsEndpoint
-                    TWITTER_ACCESS_SECRET: !Ref TwitterAccessSecret
-                    TWITTER_ACCESS_TOKEN: !Ref TwitterAccessToken
-                    TWITTER_CONSUMER_KEY: !Ref TwitterConsumerKey
-                    TWITTER_CONSUMER_SECRET: !Ref TwitterConsumerSecret
-            Policies:
-            - S3ReadPolicy:
-                BucketName: aircraft-registry
-            Events:
-                Daily:
-                    InvocationLevel:
-                    # I want this to run after the previous lambda finishes
-                    # I can do this through the UI but don't yet know
-                    # how to configure it with this template.
-                    # 
-                    # We'll default to an hour after the previous lambda is invoked.
-                    Type: Schedule
-                    Properties:
-                        Schedule: cron(0 7 30 * ? *)
-            Tags: 
-                project: aviation
-    

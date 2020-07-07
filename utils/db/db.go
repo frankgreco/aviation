@@ -42,16 +42,19 @@ type QueryScan struct {
 	Callback  ScanFunc
 }
 
+type QueryDetails struct {
+	Duration time.Duration `json:"duration"`
+}
+
 func New(url string, logger logger) (*DB, error) {
 	return Open("pgx", url, logger)
 }
 
 func Open(driverName, url string, logger logger) (*DB, error) {
-	sqlDB, err := sql.Open(driverName, url)
+	sqlxDB, err := sqlx.Open(driverName, url)
 	if err != nil {
 		return nil, err
 	}
-	sqlxDB := sqlx.NewDb(sqlDB, "pgx")
 
 	if logger == nil {
 		logger = log.New()
@@ -89,15 +92,20 @@ func (db *DB) QueryRows(ctx context.Context, scanFunc ScanFunc, query sq.Sqlizer
 	})
 }
 
+func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans ...QueryScan) (out []interface{}, err error) {
+	out, _, err = db.QueryRowsTxDetails(ctx, existingTx, queryScans...)
+	return out, err
+}
+
 // QueryRowsTx will execute one or more queries and envoke the provided called for each.
 // If more than one query is provided, a transaction will be used. The callback is envoked
 // after the first row has been "loaded". This means that the callback should end with a
 // check to rows.Next() rather than begin.
-func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans ...QueryScan) (out []interface{}, err error) {
+func (db *DB) QueryRowsTxDetails(ctx context.Context, existingTx *sqlx.Tx, queryScans ...QueryScan) (out []interface{}, details QueryDetails, err error) {
 
 	// Perform input validation and silenty fail.
 	if queryScans == nil || len(queryScans) < 1 {
-		return nil, nil
+		return nil, details, nil
 	}
 
 	// The method we envoke to execute the query lives on different receiver types
@@ -118,7 +126,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 			Isolation: sql.LevelSerializable,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("could not begin transaction: %s", err.Error())
+			return nil, details, fmt.Errorf("could not begin transaction: %s", err.Error())
 		}
 		defer tx.Rollback()
 		driver.maybeTx = tx
@@ -141,7 +149,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 				q, err := qs.QueryFunc()
 				if err != nil {
 					db.logger.Error(err.Error())
-					return nil, err
+					return nil, details, err
 				}
 				providedQuery = q
 			}
@@ -154,15 +162,17 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		if err != nil {
 			msg := fmt.Sprintf("failed to generate sql for query %s", qs.Name)
 			db.logger.Error(msg)
-			return nil, fmt.Errorf("%s: %s", msg, err.Error())
+			return nil, details, fmt.Errorf("%s: %s", msg, err.Error())
 		}
 		db.logger.Debug("query", q)
 		// Execute the query.
+		queryTime := time.Now()
 		rows, err := driver.QueryxContext(ctx, q, args...)
+		details.Duration = time.Duration(int64(details.Duration) + time.Now().Sub(queryTime).Nanoseconds())
 		if err != nil {
 			msg := fmt.Sprintf("failed to query %s", qs.Name)
 			db.logger.Error(msg)
-			return nil, fmt.Errorf("%s: %s", msg, err.Error())
+			return nil, details, fmt.Errorf("%s: %s", msg, err.Error())
 		}
 		defer rows.Close()
 		// Load first row now so that we can check for the final batch of errors.
@@ -171,14 +181,14 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		if err := rows.Err(); err != nil {
 			msg := fmt.Sprintf("failed to query %s", qs.Name)
 			db.logger.Error(msg)
-			return nil, fmt.Errorf("%s: %s", msg, err.Error())
+			return nil, details, fmt.Errorf("%s: %s", msg, err.Error())
 		}
 		// The query was successful. This doesn't mean rows were returned.
 		// We can't blindly return ErrNotFound as the query may not have requested rows.
 		if !hasNext {
 			// TODO: is this robust enough?
 			if strings.HasPrefix(q, "SELECT") || strings.Contains(q, "RETURNING") {
-				return nil, ErrNotFound
+				return nil, details, ErrNotFound
 			}
 		}
 		// If no callback was provided, continue to the next query.
@@ -186,7 +196,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 			// Envoke callback.
 			out, err = qs.Callback(rows)
 			if err != nil {
-				return nil, fmt.Errorf("error scanning rows: %s", err.Error())
+				return nil, details, fmt.Errorf("error scanning rows: %s", err.Error())
 			}
 		}
 		rows.Close()
@@ -197,7 +207,7 @@ func (db *DB) QueryRowsTx(ctx context.Context, existingTx *sqlx.Tx, queryScans .
 		if err := driver.maybeTx.(*sqlx.Tx).Commit(); err != nil {
 			err = fmt.Errorf("could not commit transaction: %s", err.Error())
 			db.logger.Error(err)
-			return nil, err
+			return nil, details, err
 		}
 	}
 	return

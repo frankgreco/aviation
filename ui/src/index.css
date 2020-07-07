@@ -1,0 +1,242 @@
+* {
+    margin : 0;
+    padding : 0;
+    box-sizing: border-box;
+}
+  
+
+html, body{
+    min-width:100%;
+    background-color: #262626;
+}
+
+.home {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-item.top {
+    flex: 3;
+    /* border: 5px solid red; */
+}
+
+.home-item.middle {
+    flex: 4;
+    /* border: 5px solid red; */
+}
+
+.home-item.bottom {
+    flex: 4;
+    /* border: 5px solid red; */
+}
+
+.graph-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.search-container {
+    /* border: 5px solid red; */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+}
+
+.input-and-results {
+    background-color: #4D4D4D;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px; /* if alignment becomes an issue, remove this line */
+    position: absolute;
+    width: 40%;
+    z-index: 1; /* bring to front */
+}
+
+.search-input {
+    box-sizing:border-box;
+    padding: 1vh;
+    flex: 1;
+}
+
+.seperator-parent {
+    display: flex;
+    justify-content: center;
+    flex: 1;
+}
+
+.results-container-parent {
+    display: flex;
+    justify-content: center;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+.search {
+    display: flex;
+    flex-direction: row;
+}
+
+.bar {
+    flex: 30;
+}
+
+.results-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    max-height: 50vh;
+    overflow-y: scroll;
+    background-color: #4D4D4D;
+    box-sizing: border-box;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.search-icon {
+    color: #EEEEEE;
+    /* outline: 5px solid blue; */
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    flex: 2; 
+}
+
+.plane {
+    color: #EEEEEE;
+    /* outline: 5px solid blue; */
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    flex: 2;
+}
+
+.tags {
+    flex: 32;
+    padding-left: 5px;
+    display: flex;
+    flex-direction: row;
+    overflow-x: scroll;
+}
+
+.search input {
+    box-sizing:border-box;
+    height: 100%;
+    width: 100%;
+    display: block;
+    background: transparent;
+    padding: 5px;
+    border: none;
+    font-size: 1vh;
+    color: #EEEEEE;
+    font-family: "Roboto";
+    font-weight: 400;
+    /* outline: 1px solid black; */
+}
+
+.search input::placeholder {
+    font-family: "Roboto";
+    font-weight: 400;
+    color: #999999;
+    font-size: 1vh;
+}
+
+input:focus, textarea:focus, select:focus{
+    outline: none;
+    border: none;
+    /* outline: 1px solid black; */
+}
+
+.label {
+    /* display: flex; */
+    color: black;
+    /* padding: 5px 10px; */
+    white-space: nowrap;
+    text-align:center;
+    border-radius: 5px;
+    font-family: "Roboto";
+    font-weight: 400;
+    font-size: 0.65em;
+    justify-content: flex-start;
+    flex: 0 1 auto;
+    display: inline-flex;
+    align-items: center;
+    background-color: white;
+    padding: 5px; /* FIXME */
+    margin-right: 5px;  /* FIXME */
+}
+
+.label {
+    /* margin: 5px; */
+    /* flex: 1; */
+    /* align-items: center; */
+    display: inline-flex;
+    color: black;
+    justify-content: left;
+}
+
+.seperator {
+    width: 95%;
+    height: 1px;
+    background-color: #999999;
+    /* margin-bottom: 5px; */
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 1vh;
+}
+
+.container:hover {
+    background-color: #999999;
+}
+
+.label-parent {
+    /* outline: 2px solid red; */
+    vertical-align: middle;
+    display: inline-flex;
+}
+
+.label.n-number {
+    /* outline: 3px solid #00b894; */
+    /* background-color: #00b894; */
+}
+
+.label.year {
+    /* outline: 3px solid #6c5ce7; */
+    /* background-color: #6c5ce7; */
+}
+
+.label.make {
+    /* outline: 3px solid #fdcb6e; */
+    /* background-color: #fdcb6e; */
+}
+
+.label.model {
+    /* outline: 3px solid #e84393; */
+    /* background-color: #e84393; */
+}
+
+.label.engines {
+    /* outline: 3px solid #d63031; */
+    /* background-color: #d63031; */
+}
+
+.label.seats {
+    /* outline: 3px solid #2d3436; */
+    /* background-color: #2d3436; */
+}
+
+.label.speed {
+    /* outline: 3px solid #e17055; */
+    /* background-color: #e17055; */
+}

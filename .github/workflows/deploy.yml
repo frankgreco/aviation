@@ -40,7 +40,7 @@ jobs:
       with:
         node-version: v14.5.0
     - name: build ui
-      run: cd ui && npm i --production && npm run build
+      run: cd ui && npm i && npm run build
     - name: deploy website
       run: make ui
       env:

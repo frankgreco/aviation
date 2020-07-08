@@ -29,7 +29,7 @@ describe:
 			--stack-name $(AWS_STACK_NAME)
 
 .PHONY: up
-up: binary
+up: 
 	sam local -t $(AWS_TEMPLATE)
 
 .PHONY: invoke

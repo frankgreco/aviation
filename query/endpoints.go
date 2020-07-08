@@ -35,7 +35,7 @@ func MakeSearchEndpoint(s Service) endpoint.Endpoint {
 			resp.Error = api.WrapErr(err, "could not base64 decode query").(*api.Error)
 		}
 
-		results, err := s.Search(ctx, string(query))
+		results, err := s.Search(ctx, string(query), req.Limit)
 		if err != nil {
 			resp.Error = err.(*api.Error)
 			return resp, nil

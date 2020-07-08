@@ -6,14 +6,14 @@ import { createLogger } from 'redux-logger'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './reducers'
 
-const loggerMiddleware = createLogger()
-
 const store = createStore(
     rootReducer,
     {},
-    applyMiddleware(
+    process.env.NODE_ENV === 'production' ? applyMiddleware(
+        thunkMiddleware
+    ) : applyMiddleware(
         thunkMiddleware,
-        loggerMiddleware 
+        createLogger()
     )
 )
 

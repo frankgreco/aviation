@@ -9,7 +9,7 @@ import (
 )
 
 type Service interface {
-	Search(context.Context, string) ([]api.SearchResult, error)
+	Search(context.Context, string, int) ([]api.SearchResult, error)
 }
 
 type service struct {
@@ -20,6 +20,6 @@ func NewService(db *sql.DB) Service {
 	return &service{db}
 }
 
-func (s *service) Search(ctx context.Context, query string) ([]api.SearchResult, error) {
-	return search.New(append(search.Parse(query), search.Database(s.db))...)
+func (s *service) Search(ctx context.Context, query string, limit int) ([]api.SearchResult, error) {
+	return search.New(append(search.Parse(query), search.Database(s.db), search.Limit(limit))...)
 }

@@ -3,7 +3,6 @@ package search
 import (
 	"database/sql"
 	"strings"
-	//"github.com/frankgreco/aviation/utils/db"
 )
 
 type Filters struct {
@@ -14,6 +13,7 @@ type Filters struct {
 type Config struct {
 	Filters
 	Database *sql.DB
+	Limit    *int
 }
 
 type Option func(*Config)
@@ -36,6 +36,14 @@ func Airline(airline string) Option {
 func Database(db *sql.DB) Option {
 	return Option(func(cfg *Config) {
 		cfg.Database = db
+	})
+}
+
+func Limit(limit int) Option {
+	return Option(func(cfg *Config) {
+		if limit > 0 {
+			cfg.Limit = &limit
+		}
 	})
 }
 

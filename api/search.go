@@ -2,6 +2,7 @@ package api
 
 type SearchRequest struct {
 	Query string
+	Limit int
 }
 
 type SearchResponse struct {
@@ -15,17 +16,11 @@ type SearchResponse struct {
 type SearchResult struct {
 	NNumber          string `json:"n_number,omitempty"`
 	YearManufactured string `json:"year_manufactured,omitempty"`
-	// Registrant         Registrant     `json:"registrant"`
-	// Classification     Classification `json:"classificaiotn"`
-	// ApprovedOperations []string       `json:"approved_operations"`
-	// Type               AircraftType   `json:"type"`
-	Make  string `json:"make,omitempty"`
-	Model string `json:""model,omitempty`
-	// EngineType         EngineType     `json:"engine_type"`
-	NumEngines int `json:"num_engines,omitempty"`
-	NumSeats   int `json:"num_seats,omitempty"`
-	// Weight        int `json:"weight,omitempty"`
-	CruisingSpeed int `json:"cruising_speed,omitempty"`
+	Make             string `json:"make,omitempty"`
+	Model            string `json:""model,omitempty`
+	NumEngines       int    `json:"num_engines,omitempty"`
+	NumSeats         int    `json:"num_seats,omitempty"`
+	CruisingSpeed    int    `json:"cruising_speed,omitempty"`
 }
 
 func (resp *SearchResponse) GetError() *Error {

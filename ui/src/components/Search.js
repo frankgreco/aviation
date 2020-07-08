@@ -5,6 +5,7 @@ import ClearIcon from '@material-ui/icons/Clear';
 import Suggestions from '../containers/Suggestions.js';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Tag from './Tag.js';
 
 export default ({ query, registrations, handleChange, onClick, isFetching, input }) => {
 
@@ -45,6 +46,20 @@ export default ({ query, registrations, handleChange, onClick, isFetching, input
                     </span>
                 </div>
             </div>
+            {
+                query.length > 0 ? 
+                    <div className="filters-parent">
+                        <div className="filters-item" />
+                        <div className="filters">
+                            <Tag v="tail number" invert={true} />
+                            <Tag v="make" invert={true}/>
+                            <Tag v="model" invert={true}/>
+                            <Tag v="airline" invert={true}/>
+                        </div>
+                        <div className="filters-item"/>
+                    </div>
+                : null
+            }
             {
                 isFetching ? 
                     <ThemeProvider theme={theme}>

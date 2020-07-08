@@ -8,6 +8,7 @@
 html, body{
     min-width:100%;
     background-color: #262626;
+    overflow: hidden;
 }
 
 .home {
@@ -20,17 +21,14 @@ html, body{
 
 .home-item.top {
     flex: 3;
-    /* border: 5px solid red; */
 }
 
 .home-item.middle {
     flex: 4;
-    /* border: 5px solid red; */
 }
 
 .home-item.bottom {
     flex: 4;
-    /* border: 5px solid red; */
 }
 
 .graph-container {
@@ -40,7 +38,6 @@ html, body{
 }
 
 .search-container {
-    /* border: 5px solid red; */
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -101,20 +98,44 @@ html, body{
 
 .search-icon {
     color: #EEEEEE;
-    /* outline: 5px solid blue; */
     align-items: center;
     display: inline-flex;
     justify-content: center;
-    flex: 2; 
+    flex: 3; 
 }
 
 .plane {
     color: #EEEEEE;
-    /* outline: 5px solid blue; */
     align-items: center;
     display: inline-flex;
     justify-content: center;
-    flex: 2;
+    flex: 3;
+}
+
+.filters-parent {
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0vh 1vh 1vh 1vh;
+}
+
+.filters-item {
+    flex: 3;
+    /* border: 2px solid red; */
+    align-items: center;
+    justify-content: center;
+}
+
+.filters {
+    flex: 30;
+    flex-shrink: 30;
+    display: inline-flex;
+    flex-direction: row;
+    overflow-x: scroll;
+    vertical-align: middle;
+    justify-content: flex-start;
+    padding-left: 5px;
 }
 
 .tags {
@@ -133,30 +154,26 @@ html, body{
     background: transparent;
     padding: 5px;
     border: none;
-    font-size: 1vh;
+    font-size: 1.5vh;
     color: #EEEEEE;
     font-family: "Roboto";
     font-weight: 400;
-    /* outline: 1px solid black; */
 }
 
 .search input::placeholder {
     font-family: "Roboto";
     font-weight: 400;
     color: #999999;
-    font-size: 1vh;
+    font-size: 1.5vh;
 }
 
 input:focus, textarea:focus, select:focus{
     outline: none;
     border: none;
-    /* outline: 1px solid black; */
 }
 
 .label {
-    /* display: flex; */
-    color: black;
-    /* padding: 5px 10px; */
+    color: #262626;
     white-space: nowrap;
     text-align:center;
     border-radius: 5px;
@@ -172,20 +189,15 @@ input:focus, textarea:focus, select:focus{
     margin-right: 5px;  /* FIXME */
 }
 
-.label {
-    /* margin: 5px; */
-    /* flex: 1; */
-    /* align-items: center; */
-    display: inline-flex;
-    color: black;
-    justify-content: left;
+.label.invert {
+    background-color: #262626;
+    color: white;
 }
 
 .seperator {
     width: 95%;
     height: 1px;
     background-color: #999999;
-    /* margin-bottom: 5px; */
 }
 
 .container {
@@ -201,42 +213,6 @@ input:focus, textarea:focus, select:focus{
 }
 
 .label-parent {
-    /* outline: 2px solid red; */
     vertical-align: middle;
     display: inline-flex;
-}
-
-.label.n-number {
-    /* outline: 3px solid #00b894; */
-    /* background-color: #00b894; */
-}
-
-.label.year {
-    /* outline: 3px solid #6c5ce7; */
-    /* background-color: #6c5ce7; */
-}
-
-.label.make {
-    /* outline: 3px solid #fdcb6e; */
-    /* background-color: #fdcb6e; */
-}
-
-.label.model {
-    /* outline: 3px solid #e84393; */
-    /* background-color: #e84393; */
-}
-
-.label.engines {
-    /* outline: 3px solid #d63031; */
-    /* background-color: #d63031; */
-}
-
-.label.seats {
-    /* outline: 3px solid #2d3436; */
-    /* background-color: #2d3436; */
-}
-
-.label.speed {
-    /* outline: 3px solid #e17055; */
-    /* background-color: #e17055; */
 }

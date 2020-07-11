@@ -13,8 +13,11 @@ class Search extends Component {
         fetchRegistrations: PropTypes.func,
         disableFilter: PropTypes.func,
         isFetching: PropTypes.bool,
-        registrations: PropTypes.array
+        registrations: PropTypes.array,
+        searchFilters: PropTypes.object
     }
+
+    hasFilters = f => Object.keys(f).filter(k => f[k].enabled).length > 0
 
     shouldFetchRegistrations = q => {
         switch(q.length) {
@@ -43,6 +46,7 @@ class Search extends Component {
 
     handleClear = () => {
         this.props.searchQuery('')
+        // there has to be a better way to do this
         this.props.disableFilter('make')
         this.props.disableFilter('model')
         this.props.disableFilter('airline')
@@ -58,12 +62,13 @@ class Search extends Component {
             onClick={this.handleClear}
             isFetching={this.props.isFetching}
             input={input => { this.input = input; }}
+            hasFilters={this.hasFilters(this.props.searchFilters)}
         />
     )
 }
 
 const mapStateToProps = state => {
-    const { searchQuery, registrationsByQuery } = state
+    const { searchQuery, registrationsByQuery, searchFilters } = state
     const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
         isFetching: false
     }
@@ -71,7 +76,8 @@ const mapStateToProps = state => {
     return {
         query: state.searchQuery,
         isFetching,
-        registrations
+        registrations,
+        searchFilters
     }
 }
 

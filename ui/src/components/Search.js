@@ -9,7 +9,7 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Tag from './Tag.js';
 
-export default ({ query, registrations, handleChange, onClick, isFetching, input }) => {
+export default ({ query, registrations, handleChange, onClick, isFetching, input, hasFilters }) => {
 
     const theme = createMuiTheme({
         overrides: {
@@ -48,7 +48,7 @@ export default ({ query, registrations, handleChange, onClick, isFetching, input
                         </span>
                     </div>
                     <span fontSize="small" className="search-icon">
-                        {query.length > 0 ? <ClearIcon onClick={onClick} fontSize="inherit"/> : null}
+                        {query.length > 0 || hasFilters ? <ClearIcon onClick={onClick} fontSize="inherit"/> : null}
                     </span>
                 </div>
             </div>

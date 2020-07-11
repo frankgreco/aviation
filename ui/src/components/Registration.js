@@ -3,7 +3,6 @@ import Tag from './Tag.js'
 import '../index.css';
 import AirplanemodeActiveIcon from '@material-ui/icons/AirplanemodeActive';
 
-
 export default ({ registration }) => (
     <div className="container">
         <span className="plane">

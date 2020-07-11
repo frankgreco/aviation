@@ -21,6 +21,8 @@ class Filter extends Component {
         }
     }
 
+    componentDidMount = () => this.input.focus()
+
     handleKeyDown = f => e => {
         switch(e.key) {
             case 'Backspace':
@@ -42,6 +44,7 @@ class Filter extends Component {
         onKeyDown={this.handleKeyDown(this.props.name)}
         onChange={e => {this.handleChange(e)}}
         value={this.state.value}
+        input={input => { this.input = input; }}
     />
 }
 

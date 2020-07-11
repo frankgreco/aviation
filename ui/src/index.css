@@ -54,10 +54,10 @@ html, body{
     position: absolute;
     width: 40%;
     z-index: 1; /* bring to front */
+    box-shadow: 10px 10px 15px 5px #222;
 }
 
 .search-input {
-    box-sizing:border-box;
     padding: 1vh;
     flex: 1;
 }
@@ -71,7 +71,6 @@ html, body{
 .results-container-parent {
     display: flex;
     justify-content: center;
-    box-sizing: border-box;
     flex: 1;
 }
 
@@ -84,6 +83,14 @@ html, body{
     flex: 30;
 }
 
+.search-parent {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex: 30;
+    padding-left: 5px;
+}
+
 .results-container {
     width: 100%;
     display: flex;
@@ -91,9 +98,7 @@ html, body{
     max-height: 50vh;
     overflow-y: scroll;
     background-color: #4D4D4D;
-    box-sizing: border-box;
     margin: 0 auto;
-    box-sizing: border-box;
 }
 
 .search-icon {
@@ -122,9 +127,10 @@ html, body{
 
 .filters-item {
     flex: 3;
-    /* border: 2px solid red; */
     align-items: center;
     justify-content: center;
+    color: #EEEEEE;
+    display: inline-flex;
 }
 
 .filters {
@@ -141,13 +147,63 @@ html, body{
 .tags {
     flex: 32;
     padding-left: 5px;
-    display: flex;
+    display: inline-flex;
     flex-direction: row;
     overflow-x: scroll;
+    justify-content: flex-start;
 }
 
-.search input {
-    box-sizing:border-box;
+/* FIXME */
+.tags span span {
+    margin-right: 5px;
+}
+
+/* FIXME */
+.filters span span {
+    margin-right: 5px;
+}
+
+.test-tag span span {
+    border: none;
+    box-shadow: none;
+}
+
+.test {
+    display: flex;
+    background-color: #262626;
+    border-radius: 5px;
+    flex-direction: row;
+    justify-content: flex-start;
+    flex: 15;
+    overflow: hidden;
+    box-shadow: 0px 0px 0px 1px #262626;
+    margin-right: 5px;
+}
+
+.test-tag {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.test-input-parent {
+    flex: 3;
+    background-color: #4D4D4D;
+}
+
+.test-input {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-family: "Roboto";
+    font-weight: 400;
+    font-size: 0.65em;
+    padding: 5px;
+    /* max-width: 100px;
+    min-width: 10px; */
+}
+
+.raw-input {
     height: 100%;
     width: 100%;
     display: block;
@@ -186,7 +242,7 @@ input:focus, textarea:focus, select:focus{
     align-items: center;
     background-color: white;
     padding: 5px; /* FIXME */
-    margin-right: 5px;  /* FIXME */
+    box-shadow: 0px 0px 0px 1px #262626;
 }
 
 .label.invert {
@@ -215,4 +271,5 @@ input:focus, textarea:focus, select:focus{
 .label-parent {
     vertical-align: middle;
     display: inline-flex;
+    cursor:pointer;
 }

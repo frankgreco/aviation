@@ -12,8 +12,7 @@ class Suggestions extends Component {
 
     shouldComponentUpdate = props => !props.isFetching
 
-    // use https://www.npmjs.com/package/react-infinite-scroll-component 
-    render = () => this.props.registrations === undefined ? null : (this.props.registrations.slice(0, 10).map((r, i) => <Registration key={i} registration={r}/>))
+    render = () => this.props.registrations === undefined ? null : (this.props.registrations.map((r, i) => <Registration key={i} registration={r}/>))
 }
 
 const mapStateToProps = state => {

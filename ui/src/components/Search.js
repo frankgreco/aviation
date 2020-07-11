@@ -3,6 +3,8 @@ import '../index.css';
 import SearchIcon from '@material-ui/icons/Search';
 import ClearIcon from '@material-ui/icons/Clear';
 import Suggestions from '../containers/Suggestions.js';
+import Filters from '../containers/Filters.js';
+import Tray from '../containers/Tray.js';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Tag from './Tag.js';
@@ -30,36 +32,27 @@ export default ({ query, registrations, handleChange, onClick, isFetching, input
             <div className="search-input">
                 <div className="search">
                     <span className="search-icon">
-                        <SearchIcon/>
+                        <SearchIcon fontSize="small" />
                     </span>
-                    <span className="bar">
-                        <input
-                            placeholder="Search by tail number..."
-                            value={query}
-                            onChange={handleChange}
-                            autoFocus="autofocus"
-                            ref={input}
-                        />
-                    </span>
+                    <div className="search-parent">
+                        <Filters />
+                        <span className="bar">
+                            <input
+                                className="raw-input"
+                                // placeholder="Search..."
+                                value={query}
+                                onChange={handleChange}
+                                autoFocus="autofocus"
+                                ref={input}
+                            />
+                        </span>
+                    </div>
                     <span fontSize="small" className="search-icon">
                         {query.length > 0 ? <ClearIcon onClick={onClick} fontSize="inherit"/> : null}
                     </span>
                 </div>
             </div>
-            {
-                query.length > 0 ? 
-                    <div className="filters-parent">
-                        <div className="filters-item" />
-                        <div className="filters">
-                            <Tag v="tail number" invert={true} />
-                            <Tag v="make" invert={true}/>
-                            <Tag v="model" invert={true}/>
-                            <Tag v="airline" invert={true}/>
-                        </div>
-                        <div className="filters-item"/>
-                    </div>
-                : null
-            }
+            <Tray />
             {
                 isFetching ? 
                     <ThemeProvider theme={theme}>

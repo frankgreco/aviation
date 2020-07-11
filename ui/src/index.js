@@ -8,7 +8,22 @@ import rootReducer from './reducers'
 
 const store = createStore(
     rootReducer,
-    {},
+    {
+        searchFilters: {
+            "tail number": {
+                enabled: false
+            },
+            make: {
+                enabled: false
+            },
+            model: {
+                enabled: false
+            },
+            airline: {
+                enabled: false
+            },
+        }
+    },
     process.env.NODE_ENV === 'production' ? applyMiddleware(
         thunkMiddleware
     ) : applyMiddleware(

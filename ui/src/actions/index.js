@@ -1,5 +1,15 @@
 import axios from 'axios'
 
+export const ENABLE_SEARCH_FILTER = "ENABLE_SEARCH_FILTER"
+export function enableSearchFilter(filter) {
+    return { type: ENABLE_SEARCH_FILTER, filter }
+}
+
+export const DISABLE_SEARCH_FILTER = "DISABLE_SEARCH_FILTER"
+export function disableSearchFilter(filter) {
+    return { type: DISABLE_SEARCH_FILTER, filter }
+}
+
 export const SEARCH_QUERY = "SEARCH_QUERY"
 export function searchQuery(searchQuery) {
     return { type: SEARCH_QUERY, searchQuery }
@@ -25,7 +35,8 @@ export function fetchRegistrations(searchQuery) {
         dispatch(requestRegistrations(searchQuery))
         return axios.get(`https://5sh4xcm7m8.execute-api.us-west-2.amazonaws.com/Prod/search`, {
             params: {
-                q: btoa(`tail_number: ${searchQuery}`)
+                q: btoa(`tail_number: ${searchQuery}`),
+                limit: 10
             }
         }).then(response => dispatch(receiveRegistrations(searchQuery, response.data)))
     }

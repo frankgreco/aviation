@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { fetchRegistrationsIfNeeded, searchQuery } from '../actions'
+import { fetchRegistrationsIfNeeded, searchQuery, disableSearchFilter } from '../actions'
 import { reset } from '../utils/timer';
 import SearchComponent from '../components/Search.js';
 
@@ -11,13 +11,10 @@ class Search extends Component {
         query: PropTypes.string,
         searchQuery: PropTypes.func,
         fetchRegistrations: PropTypes.func,
+        disableFilter: PropTypes.func,
         isFetching: PropTypes.bool,
         registrations: PropTypes.array
     }
-
-    // componentDidMount = () => {
-    //     this.input.focus();
-    // }
 
     shouldFetchRegistrations = q => {
         switch(q.length) {
@@ -46,6 +43,10 @@ class Search extends Component {
 
     handleClear = () => {
         this.props.searchQuery('')
+        this.props.disableFilter('make')
+        this.props.disableFilter('model')
+        this.props.disableFilter('airline')
+        this.props.disableFilter('tail number')
         this.input.focus()
     }
       
@@ -56,7 +57,7 @@ class Search extends Component {
             handleChange={e => {this.handleChange(e)}}
             onClick={this.handleClear}
             isFetching={this.props.isFetching}
-            input={(input) => { this.input = input; }}
+            input={input => { this.input = input; }}
         />
     )
 }
@@ -76,9 +77,10 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-      fetchRegistrations: q => dispatch(fetchRegistrationsIfNeeded(q)),
-      searchQuery: q => dispatch(searchQuery(q))
+        fetchRegistrations: q => dispatch(fetchRegistrationsIfNeeded(q)),
+        searchQuery: q => dispatch(searchQuery(q)),
+        disableFilter: f => dispatch(disableSearchFilter(f))
     }
-  }
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(Search)

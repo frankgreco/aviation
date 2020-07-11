@@ -6,7 +6,9 @@ import AirplanemodeActiveIcon from '@material-ui/icons/AirplanemodeActive';
 
 export default ({ registration }) => (
     <div className="container">
-        <span className="plane"><AirplanemodeActiveIcon  /></span>
+        <span className="plane">
+            <AirplanemodeActiveIcon fontSize="small" />
+        </span>
         <div className="tags">
             <Tag k="n-number" v={registration.n_number} />
             <Tag k="make" v={registration.make} />

@@ -2,10 +2,9 @@ import React from 'react';
 import '../index.css';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import Tag from '../components/Tag.js';
+import { allEnabled } from '../utils/timer.js' 
 
 const renderTagIfNeeded = (searchFilters, key, onClick) => searchFilters[key].enabled ? null : <Tag v={key} onClick={onClick(key) } invert={true} />
-
-const allEnabled = searchFilters => Object.keys(searchFilters).filter(k => !searchFilters[k].enabled).length === 0
 
 export default ({ onClick, searchFilters }) => allEnabled(searchFilters) ? null : 
     <div className="filters-parent">

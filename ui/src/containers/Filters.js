@@ -9,10 +9,20 @@ class Filters extends Component {
         searchFilters: PropTypes.object,
     }
 
-    render = () => (Object.keys(this.props.searchFilters).map((k, i) => this.props.searchFilters[k].enabled ? <Filter
-        key={i}
-        name={k}
-    /> : null))
+    render = () => {
+        const { searchFilters } = this.props 
+
+        let enabledFilters = Object.keys(searchFilters).filter(k => searchFilters[k].enabled).reduce((obj, key) => {
+            obj[key] = searchFilters[key]
+            return obj
+        }, {}) 
+        
+        return Object.keys(enabledFilters).map((k, i) => enabledFilters[k].enabled ? <Filter
+            key={i}
+            name={k}
+            includeConj={i > 0}
+        /> : null)
+    }
 }
 
 const mapStateToProps = state => {

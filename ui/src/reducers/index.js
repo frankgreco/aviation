@@ -5,6 +5,7 @@ import {
     RECEIVE_REGISTRATIONS,
     ENABLE_SEARCH_FILTER,
     DISABLE_SEARCH_FILTER,
+    HIDE_CODE_VIEW
 } from '../actions'
 
 function searchQuery(state = '', action) {
@@ -16,18 +17,32 @@ function searchQuery(state = '', action) {
   }
 }
 
-function searchFilters(state = {}, action) {
+function hideCodeView(state= true, action) {
+  switch (action.type) {
+    case HIDE_CODE_VIEW:
+        return action.value
+    default:
+        return state
+  }
+}
+
+function searchFilters(state = {
+  enabled: false,
+  value: ''
+}, action) {
   switch (action.type) {
     case ENABLE_SEARCH_FILTER:
       return Object.assign({}, state, {
         [action.filter]: Object.assign({}, state[action.filter], {
-          enabled: true
+          enabled: true,
+          value: action.query
         })
       })
     case DISABLE_SEARCH_FILTER:
       return Object.assign({}, state, {
         [action.filter]: Object.assign({}, state[action.filter], {
-          enabled: false
+          enabled: false,
+          value: ''
         })
       })
     default:
@@ -73,7 +88,8 @@ function registrationsByQuery(state = {}, action) {
 const rootReducer = combineReducers({
     registrationsByQuery,
     searchQuery,
-    searchFilters
+    searchFilters,
+    hideCodeView
 })
 
 export default rootReducer

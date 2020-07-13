@@ -1,13 +1,18 @@
 import axios from 'axios'
 
+export const HIDE_CODE_VIEW = "HIDE_CODE_VIEW"
+export function hideCodeView(value) {
+    return { type: HIDE_CODE_VIEW, value }
+}
+
 export const ENABLE_SEARCH_FILTER = "ENABLE_SEARCH_FILTER"
-export function enableSearchFilter(filter) {
-    return { type: ENABLE_SEARCH_FILTER, filter }
+export function enableSearchFilter(filter, query = '') {
+    return { type: ENABLE_SEARCH_FILTER, filter, query }
 }
 
 export const DISABLE_SEARCH_FILTER = "DISABLE_SEARCH_FILTER"
-export function disableSearchFilter(filter) {
-    return { type: DISABLE_SEARCH_FILTER, filter }
+export function disableSearchFilter(filter, query = '') {
+    return { type: DISABLE_SEARCH_FILTER, filter, query }
 }
 
 export const SEARCH_QUERY = "SEARCH_QUERY"

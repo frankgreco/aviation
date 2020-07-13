@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { fetchRegistrationsIfNeeded, searchQuery, disableSearchFilter } from '../actions'
+import { 
+    fetchRegistrationsIfNeeded,
+    searchQuery,
+    disableSearchFilter,
+    hideCodeView,
+} from '../actions'
 import { reset } from '../utils/timer';
 import SearchComponent from '../components/Search.js';
 
@@ -14,7 +19,21 @@ class Search extends Component {
         disableFilter: PropTypes.func,
         isFetching: PropTypes.bool,
         registrations: PropTypes.array,
-        searchFilters: PropTypes.object
+        searchFilters: PropTypes.object,
+        hideCodeView: PropTypes.bool,
+        toggleCodeView: PropTypes.func
+    }
+
+    buildQuery = searchFilters => {
+        let filters = []
+
+        Object.keys(searchFilters).map(k => {
+            if (searchFilters[k] !== undefined && searchFilters[k].value !== undefined && searchFilters[k].value !== '') {
+                filters.push(`${k}="${searchFilters[k].value}"`)
+            }
+        })
+
+        return filters.join(' AND ')
     }
 
     hasFilters = f => Object.keys(f).filter(k => f[k].enabled).length > 0
@@ -53,22 +72,31 @@ class Search extends Component {
         this.props.disableFilter('tail number')
         this.input.focus()
     }
+
+    toggleCodeView = () => this.props.toggleCodeView(!this.props.hideCodeView)
       
     render = () => (
         <SearchComponent 
-            query={this.props.query}
+            query={this.buildQuery(this.props.searchFilters)}
             registrations={this.props.registrations}
             handleChange={e => {this.handleChange(e)}}
             onClick={this.handleClear}
             isFetching={this.props.isFetching}
             input={input => { this.input = input; }}
             hasFilters={this.hasFilters(this.props.searchFilters)}
+            toggleCodeView={this.toggleCodeView}
+            hideCodeView={this.props.hideCodeView}
         />
     )
 }
 
 const mapStateToProps = state => {
-    const { searchQuery, registrationsByQuery, searchFilters } = state
+    const { 
+        searchQuery,
+        registrationsByQuery,
+        searchFilters,
+        hideCodeView,
+    } = state
     const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
         isFetching: false
     }
@@ -77,7 +105,8 @@ const mapStateToProps = state => {
         query: state.searchQuery,
         isFetching,
         registrations,
-        searchFilters
+        searchFilters,
+        hideCodeView
     }
 }
 
@@ -85,7 +114,8 @@ const mapDispatchToProps = dispatch => {
     return {
         fetchRegistrations: q => dispatch(fetchRegistrationsIfNeeded(q)),
         searchQuery: q => dispatch(searchQuery(q)),
-        disableFilter: f => dispatch(disableSearchFilter(f))
+        disableFilter: f => dispatch(disableSearchFilter(f)),
+        toggleCodeView: f => dispatch(hideCodeView(f))
     }
 }
 

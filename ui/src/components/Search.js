@@ -7,9 +7,21 @@ import Filters from '../containers/Filters.js';
 import Tray from '../containers/Tray.js';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import Tag from './Tag.js';
+import CodeIcon from '@material-ui/icons/Code';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
-export default ({ query, registrations, handleChange, onClick, isFetching, input, hasFilters }) => {
+export default ({ 
+    query,
+    registrations,
+    handleChange,
+    onClick,
+    isFetching,
+    input,
+    hasFilters,
+    toggleCodeView,
+    hideCodeView 
+}) => {
 
     const theme = createMuiTheme({
         overrides: {
@@ -29,6 +41,34 @@ export default ({ query, registrations, handleChange, onClick, isFetching, input
 
     return (
         <div className="input-and-results">
+            <div className="toggleCodeViewRoot">
+                <span className="toggleCodeViewIcon" onClick={toggleCodeView}>
+                    { hideCodeView ? <ExpandMoreIcon fontSize="small" /> : <ExpandLessIcon fontSize="small" />}
+                </span>
+                <span className="toggleCodeViewPadding"/>
+            </div>
+            { hideCodeView ? null : <div className="search-input light no-padding-top no-padding-bottom ">
+                    <div className="search">
+                        <span className="search-icon light-color">
+                            <CodeIcon fontSize="small" />
+                        </span>
+                        <div className="search-parent">
+                            {/* <Filters /> */}
+                            <span className="bar">
+                                <input
+                                    readOnly
+                                    className="raw-input light-color"
+                                    value={query}
+                                    onChange={handleChange}
+                                    autoFocus="autofocus"
+                                    ref={input}
+                                />
+                            </span>
+                        </div>
+                        <span fontSize="small" className="search-icon" />
+                    </div>
+                </div>
+            }
             <div className="search-input">
                 <div className="search">
                     <span className="search-icon">
@@ -36,16 +76,6 @@ export default ({ query, registrations, handleChange, onClick, isFetching, input
                     </span>
                     <div className="search-parent">
                         <Filters />
-                        <span className="bar">
-                            <input
-                                className="raw-input"
-                                // placeholder="Search..."
-                                value={query}
-                                onChange={handleChange}
-                                autoFocus="autofocus"
-                                ref={input}
-                            />
-                        </span>
                     </div>
                     <span fontSize="small" className="search-icon">
                         {query.length > 0 || hasFilters ? <ClearIcon onClick={onClick} fontSize="inherit"/> : null}

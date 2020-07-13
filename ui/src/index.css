@@ -57,8 +57,39 @@ html, body{
     box-shadow: 10px 10px 15px 5px #222;
 }
 
+.frank {
+    margin-right: 5px;
+}
+
+.toggleCodeViewRoot {
+    padding: 0 1vh;
+    display: flex;
+    flex-direction: row;
+    background-color: #EEEEEE;
+}
+
+.light {
+    background-color: #EEEEEE;
+}
+
+.light-color {
+    color: #262626 !important;
+}
+
+.toggleCodeViewIcon {
+    color: #262626;
+    display: inline-flex;
+    vertical-align: middle;
+    flex: 3;
+    display: flex;
+    justify-content: center;
+}
+
+.toggleCodeViewPadding {
+    flex: 33;
+}
+
 .search-input {
-    padding: 1vh;
     flex: 1;
 }
 
@@ -89,6 +120,7 @@ html, body{
     flex-wrap: wrap;
     flex: 30;
     padding-left: 5px;
+    padding-top: 1vh;
 }
 
 .results-container {
@@ -107,6 +139,9 @@ html, body{
     display: inline-flex;
     justify-content: center;
     flex: 3; 
+    padding-left: 1vh;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 }
 
 .plane {
@@ -163,6 +198,18 @@ html, body{
     margin-right: 5px;
 }
 
+.no-padding-top {
+    padding-top: unset;
+}
+
+.no-padding-bottom {
+    padding-bottom: unset;
+}
+
+.flip {
+    transform: scale(1, -1);
+}
+
 .test-tag span span {
     border: none;
     box-shadow: 0px 0px 0px 1px #262626;
@@ -170,24 +217,28 @@ html, body{
 
 .test {
     display: flex;
-    background-color: #262626;
+    flex-direction: row;
+    justify-content: flex-start; 
+    margin-bottom: 1vh;
+}
+
+.tag-input {
+    display: flex;
     border-radius: 5px;
     flex-direction: row;
     justify-content: flex-start;
-    flex: 15;
     overflow: hidden;
     box-shadow: 0px 0px 0px 1px #262626;
     margin-right: 5px;
+    background-color: #262626;
 }
 
 .test-tag {
-    flex: 1;
     display: flex;
     justify-content: center;
 }
 
 .test-input-parent {
-    flex: 3;
     background-color: #4D4D4D;
 }
 
@@ -199,6 +250,7 @@ html, body{
     font-weight: 400;
     font-size: 0.65em;
     padding: 5px;
+    width: 100%;
 }
 
 .raw-input {
@@ -209,8 +261,8 @@ html, body{
     padding: 5px;
     border: none;
     font-size: 1.5vh;
-    color: #EEEEEE;
-    font-family: "Roboto";
+    color: #262626;
+    font-family: "Courier New", Courier, monospace;
     font-weight: 400;
 }
 

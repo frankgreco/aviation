@@ -10,6 +10,7 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import CodeIcon from '@material-ui/icons/Code';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import { allEnabled } from '../utils/timer.js' 
 
 export default ({ 
     query,
@@ -20,7 +21,8 @@ export default ({
     input,
     hasFilters,
     toggleCodeView,
-    hideCodeView 
+    hideCodeView,
+    searchFilters
 }) => {
 
     const theme = createMuiTheme({
@@ -69,7 +71,7 @@ export default ({
                     </div>
                 </div>
             }
-            <div className="search-input">
+            <div className={`search-input ${allEnabled(searchFilters) ? 'padding-bottom' : ''}`}>
                 <div className="search">
                     <span className="search-icon">
                         <SearchIcon fontSize="small" />

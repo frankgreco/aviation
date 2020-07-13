@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/frankgreco/aviation/api"
@@ -22,10 +21,35 @@ func New(ops ...Option) ([]api.SearchResult, error) {
 
 	items := []api.SearchResult{}
 
+	query := "SELECT r.tail_number, r.year_manufactured, a.make, a.model, a.num_engines, a.num_seats, a.cruising_speed FROM aviation.registration r JOIN aviation.aircraft a ON r.aircraft_id = a.id WHERE r.tail_number LIKE $1 AND r.registrant->>'name' LIKE $2 AND a.make LIKE $3 AND a.model LIKE $4 LIMIT $5"
+
 	rows, err := cfg.Database.QueryContext(
 		context.Background(),
-		"SELECT r.tail_number, r.year_manufactured, a.make, a.model, a.num_engines, a.num_seats, a.cruising_speed FROM aviation.registration r JOIN aviation.aircraft a ON r.aircraft_id = a.id WHERE r.tail_number LIKE $1 LIMIT $2",
-		strings.ToUpper(fmt.Sprintf("%s%%", *cfg.Filters.TailNumber)),
+		query,
+		func() string {
+			if cfg.Filters.TailNumber == nil {
+				return "%"
+			}
+			return fmt.Sprintf("%s%%", *cfg.Filters.TailNumber)
+		}(),
+		func() string {
+			if cfg.Filters.Airline == nil {
+				return "%"
+			}
+			return fmt.Sprintf("%s%%", *cfg.Filters.Airline)
+		}(),
+		func() string {
+			if cfg.Filters.Make == nil {
+				return "%"
+			}
+			return fmt.Sprintf("%s%%", *cfg.Filters.Make)
+		}(),
+		func() string {
+			if cfg.Filters.Model == nil {
+				return "%"
+			}
+			return fmt.Sprintf("%s%%", *cfg.Filters.Model)
+		}(),
 		cfg.Limit,
 	)
 	if err != nil {

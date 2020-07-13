@@ -91,6 +91,11 @@ html, body{
 
 .search-input {
     flex: 1;
+    padding-top: 1vh;
+}
+
+.padding-bottom {
+    padding-bottom: 1vh;
 }
 
 .seperator-parent {

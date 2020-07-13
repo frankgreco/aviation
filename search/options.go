@@ -8,6 +8,8 @@ import (
 type Filters struct {
 	TailNumber *string
 	Airline    *string
+	Make       *string
+	Model      *string
 }
 
 type Config struct {
@@ -30,6 +32,20 @@ func TailNumber(tailNumber string) Option {
 func Airline(airline string) Option {
 	return Option(func(cfg *Config) {
 		cfg.Filters.Airline = &airline
+	})
+}
+
+func Make(make string) Option {
+	return Option(func(cfg *Config) {
+		make = strings.ToUpper(make)
+		cfg.Filters.Make = &make
+	})
+}
+
+func Model(model string) Option {
+	return Option(func(cfg *Config) {
+		model = strings.ToUpper(model)
+		cfg.Filters.Model = &model
 	})
 }
 

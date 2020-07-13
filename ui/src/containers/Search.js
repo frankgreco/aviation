@@ -86,6 +86,7 @@ class Search extends Component {
             hasFilters={this.hasFilters(this.props.searchFilters)}
             toggleCodeView={this.toggleCodeView}
             hideCodeView={this.props.hideCodeView}
+            searchFilters={this.props.searchFilters}
         />
     )
 }

@@ -47,12 +47,12 @@ export default ({
                 </span>
                 <span className="toggleCodeViewPadding"/>
             </div>
-            { hideCodeView ? null : <div className="search-input light no-padding-top no-padding-bottom ">
+            { hideCodeView ? null : <div className="search-input light no-padding-top no-padding-bottom">
                     <div className="search">
                         <span className="search-icon light-color">
                             <CodeIcon fontSize="small" />
                         </span>
-                        <div className="search-parent">
+                        <div className="search-parent no-padding-top">
                             {/* <Filters /> */}
                             <span className="bar">
                                 <input

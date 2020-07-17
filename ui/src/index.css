@@ -337,3 +337,8 @@ input:focus, textarea:focus, select:focus{
     display: inline-flex;
     cursor:pointer;
 }
+
+.label-parent.focus, .label-parent:focus {
+    outline: 0;
+    box-shadow: none!important;
+}

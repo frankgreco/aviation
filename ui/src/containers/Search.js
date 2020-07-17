@@ -56,11 +56,15 @@ class Search extends Component {
   }
 }
 
+Search.defaultProps = {
+  registrations: [],
+};
+
 Search.propTypes = {
   searchQueryProp: PropTypes.func.isRequired,
   disableFilter: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
-  registrations: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  registrations: PropTypes.array, // eslint-disable-line react/forbid-prop-types
   searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
   hideCodeView: PropTypes.bool.isRequired,
   toggleCodeView: PropTypes.func.isRequired,

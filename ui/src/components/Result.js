@@ -5,7 +5,7 @@ import '../index.css';
 export default function Result({ registration }) {
   return (
     <div className="result">
-      <span>{registration}</span>
+      <span>{registration.tailNumber}</span>
     </div>
   );
 }

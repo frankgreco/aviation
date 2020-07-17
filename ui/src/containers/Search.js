@@ -1,123 +1,97 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { 
-    fetchRegistrationsIfNeeded,
-    searchQuery,
-    disableSearchFilter,
-    hideCodeView,
-} from '../actions'
-import { reset } from '../utils/timer';
-import SearchComponent from '../components/Search.js';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import {
+  searchQuery as searchQueryAction,
+  disableSearchFilter,
+  hideCodeView as hideCodeViewAction,
+} from '../actions';
+import { buildQuery } from '../utils/timer';
+import SearchComponent from '../components/Search';
 
 class Search extends Component {
+  hasFilters = (f) => Object.keys(f).filter((k) => f[k].enabled).length > 0
 
-    static propTypes = {
-        query: PropTypes.string,
-        searchQuery: PropTypes.func,
-        fetchRegistrations: PropTypes.func,
-        disableFilter: PropTypes.func,
-        isFetching: PropTypes.bool,
-        registrations: PropTypes.array,
-        searchFilters: PropTypes.object,
-        hideCodeView: PropTypes.bool,
-        toggleCodeView: PropTypes.func
-    }
+  handleClear = () => {
+    const { searchQueryProp, disableFilter } = this.props;
 
-    buildQuery = searchFilters => {
-        let filters = []
+    searchQueryProp('');
+    // there has to be a better way to do this
+    disableFilter('make');
+    disableFilter('model');
+    disableFilter('airline');
+    disableFilter('tail number');
+  }
 
-        Object.keys(searchFilters).map(k => {
-            if (searchFilters[k] !== undefined && searchFilters[k].value !== undefined && searchFilters[k].value !== '') {
-                filters.push(`${k}="${searchFilters[k].value}"`)
-            }
-        })
+  toggleCodeView = () => {
+    const { toggleCodeView, hideCodeView } = this.props;
 
-        return filters.join(' AND ')
-    }
+    toggleCodeView(!hideCodeView);
+  }
 
-    hasFilters = f => Object.keys(f).filter(k => f[k].enabled).length > 0
+  render = () => {
+    const {
+      searchFilters,
+      registrations,
+      isFetching,
+      hideCodeView,
+      selectedRegistration,
+    } = this.props;
 
-    shouldFetchRegistrations = q => {
-        switch(q.length) {
-            case 0:
-                return false
-            case 1:
-                if (q.charAt(0).toUpperCase() === 'N') {
-                    return false
-                }
-                return true
-            default: 
-                return true
-        }
-    }
-    
-    handleChange = e => {
-        const { searchQuery, fetchRegistrations }  = this.props
-
-        searchQuery(e.target.value)
-        reset(1000, e.target.value).then((q) => {
-            if (this.shouldFetchRegistrations(q)) {
-                fetchRegistrations(q)
-            }
-        })
-    }
-
-    handleClear = () => {
-        this.props.searchQuery('')
-        // there has to be a better way to do this
-        this.props.disableFilter('make')
-        this.props.disableFilter('model')
-        this.props.disableFilter('airline')
-        this.props.disableFilter('tail number')
-        this.input.focus()
-    }
-
-    toggleCodeView = () => this.props.toggleCodeView(!this.props.hideCodeView)
-      
-    render = () => (
-        <SearchComponent 
-            query={this.buildQuery(this.props.searchFilters)}
-            registrations={this.props.registrations}
-            handleChange={e => {this.handleChange(e)}}
-            onClick={this.handleClear}
-            isFetching={this.props.isFetching}
-            input={input => { this.input = input; }}
-            hasFilters={this.hasFilters(this.props.searchFilters)}
-            toggleCodeView={this.toggleCodeView}
-            hideCodeView={this.props.hideCodeView}
-            searchFilters={this.props.searchFilters}
-        />
-    )
+    return (
+      <SearchComponent
+        query={buildQuery(searchFilters)}
+        registrations={registrations}
+        handleChange={(e) => { this.handleChange(e); }}
+        onClick={this.handleClear}
+        isFetching={isFetching}
+        input={(input) => { this.input = input; }}
+        hasFilters={this.hasFilters(searchFilters)}
+        toggleCodeView={this.toggleCodeView}
+        hideCodeView={hideCodeView}
+        searchFilters={searchFilters}
+        selectedRegistration={selectedRegistration}
+      />
+    );
+  }
 }
 
-const mapStateToProps = state => {
-    const { 
-        searchQuery,
-        registrationsByQuery,
-        searchFilters,
-        hideCodeView,
-    } = state
-    const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
-        isFetching: false
-    }
+Search.propTypes = {
+  searchQueryProp: PropTypes.func.isRequired,
+  disableFilter: PropTypes.func.isRequired,
+  isFetching: PropTypes.bool.isRequired,
+  registrations: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  hideCodeView: PropTypes.bool.isRequired,
+  toggleCodeView: PropTypes.func.isRequired,
+  selectedRegistration: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+};
 
-    return {
-        query: state.searchQuery,
-        isFetching,
-        registrations,
-        searchFilters,
-        hideCodeView
-    }
-}
+const mapStateToProps = (state) => {
+  const {
+    searchQuery,
+    registrationsByQuery,
+    searchFilters,
+    hideCodeView,
+    selectedRegistration,
+  } = state;
+  const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
+    isFetching: false,
+  };
 
-const mapDispatchToProps = dispatch => {
-    return {
-        fetchRegistrations: q => dispatch(fetchRegistrationsIfNeeded(q)),
-        searchQuery: q => dispatch(searchQuery(q)),
-        disableFilter: f => dispatch(disableSearchFilter(f)),
-        toggleCodeView: f => dispatch(hideCodeView(f))
-    }
-}
+  return {
+    isFetching,
+    registrations,
+    searchFilters,
+    hideCodeView,
+    selectedRegistration,
+  };
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(Search)
+const mapDispatchToProps = (dispatch) => ({
+  searchQueryProp: (q) => dispatch(searchQueryAction(q)),
+  disableFilter: (f) => dispatch(disableSearchFilter(f)),
+  toggleCodeView: (f) => dispatch(hideCodeViewAction(f)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Search);

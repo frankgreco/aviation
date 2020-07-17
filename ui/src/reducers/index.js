@@ -1,75 +1,84 @@
-import { combineReducers } from 'redux'
-import { 
-    SEARCH_QUERY,
-    REQUEST_REGISTRATIONS,
-    RECEIVE_REGISTRATIONS,
-    ENABLE_SEARCH_FILTER,
-    DISABLE_SEARCH_FILTER,
-    HIDE_CODE_VIEW
-} from '../actions'
+import { combineReducers } from 'redux';
+import {
+  SEARCH_QUERY,
+  REQUEST_REGISTRATIONS,
+  RECEIVE_REGISTRATIONS,
+  ENABLE_SEARCH_FILTER,
+  DISABLE_SEARCH_FILTER,
+  HIDE_CODE_VIEW,
+  SELECTED_REGISTRATION,
+} from '../actions';
+
+function selectedRegistration(state = {}, action) {
+  switch (action.type) {
+    case SELECTED_REGISTRATION:
+      return { ...state, ...action.value };
+    default:
+      return state;
+  }
+}
 
 function searchQuery(state = '', action) {
   switch (action.type) {
     case SEARCH_QUERY:
-        return action.searchQuery
+      return action.searchQuery;
     default:
-        return state
+      return state;
   }
 }
 
-function hideCodeView(state= true, action) {
+function hideCodeView(state = true, action) {
   switch (action.type) {
     case HIDE_CODE_VIEW:
-        return action.value
+      return action.value;
     default:
-        return state
+      return state;
   }
 }
 
 function searchFilters(state = {
   enabled: false,
-  value: ''
+  value: '',
 }, action) {
   switch (action.type) {
     case ENABLE_SEARCH_FILTER:
-      return Object.assign({}, state, {
-        [action.filter]: Object.assign({}, state[action.filter], {
+      return {
+        ...state,
+        [action.filter]: {
+          ...state[action.filter],
           enabled: true,
-          value: action.query
-        })
-      })
+          value: action.query,
+        },
+      };
     case DISABLE_SEARCH_FILTER:
-      return Object.assign({}, state, {
-        [action.filter]: Object.assign({}, state[action.filter], {
-          enabled: false,
-          value: ''
-        })
-      })
+      return {
+        ...state,
+        [action.filter]: { ...state[action.filter], ...{ enabled: false, value: '' } },
+      };
     default:
-        return state
+      return state;
   }
 }
 
 function registrations(
   state = {
     isFetching: false,
-    items: []
+    items: [],
   },
-  action
+  action,
 ) {
   switch (action.type) {
     case REQUEST_REGISTRATIONS:
-      return Object.assign({}, state, {
-        isFetching: true,
-      })
+      return { ...state, isFetching: true };
     case RECEIVE_REGISTRATIONS:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         isFetching: false,
         items: action.registrations,
-        lastUpdated: action.receivedAt
-      })
+        lastUpdated: action.receivedAt,
+      };
     default:
-      return state
+      return state;
   }
 }
 
@@ -77,19 +86,21 @@ function registrationsByQuery(state = {}, action) {
   switch (action.type) {
     case REQUEST_REGISTRATIONS:
     case RECEIVE_REGISTRATIONS:
-      return Object.assign({}, state, {
-        [action.searchQuery]: registrations(state[action.searchQuery], action)
-      })
+      return {
+        ...state,
+        [action.searchQuery]: registrations(state[action.searchQuery], action),
+      };
     default:
-      return state
+      return state;
   }
 }
 
 const rootReducer = combineReducers({
-    registrationsByQuery,
-    searchQuery,
-    searchFilters,
-    hideCodeView
-})
+  registrationsByQuery,
+  searchQuery,
+  searchFilters,
+  hideCodeView,
+  selectedRegistration,
+});
 
-export default rootReducer
+export default rootReducer;

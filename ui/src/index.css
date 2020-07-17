@@ -255,7 +255,9 @@ html, body{
     font-weight: 400;
     font-size: 0.65em;
     padding: 5px;
-    width: 100%;
+    width: 5ch;
+    /* FIX ME */
+    max-width: 25ch; 
 }
 
 .raw-input {
@@ -271,6 +273,10 @@ html, body{
     font-weight: 400;
 }
 
+.result {
+    border: 5px solid red;
+}
+
 .search input::placeholder {
     font-family: "Roboto";
     font-weight: 400;
@@ -278,10 +284,13 @@ html, body{
     font-size: 1.5vh;
 }
 
+.test-input:focus {
+    width: 5ch;
+}
+
 input:focus, textarea:focus, select:focus{
     outline: none;
     border: none;
-    width: 100%;
 }
 
 .label {
@@ -296,13 +305,13 @@ input:focus, textarea:focus, select:focus{
     flex: 0 1 auto;
     display: inline-flex;
     align-items: center;
-    background-color: white;
+    background-color: #EEEEEE;
     padding: 5px; /* FIXME */
 }
 
 .label.invert {
     background-color: #262626;
-    color: white;
+    color: #EEEEEE;
 }
 
 .seperator {

@@ -1,30 +1,51 @@
 import React, { Component } from 'react';
-import Registration from '../components/Registration.js';
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import Registration from '../components/Registration';
+import { selectedRegistration } from '../actions';
 
 class Suggestions extends Component {
+  shouldComponentUpdate = (props) => !props.isFetching
 
-    static propTypes = {
-        registrations: PropTypes.array,
-        isFetching: PropTypes.bool
-    }
+  handleClick = (r) => () => {
+    const { selectRegistration } = this.props;
+    selectRegistration(r);
+  }
 
-    shouldComponentUpdate = props => !props.isFetching
-
-    render = () => this.props.registrations === undefined ? null : (this.props.registrations.map((r, i) => <Registration key={i} registration={r}/>))
+  render = () => {
+    const { registrations } = this.props;
+    return registrations === undefined ? null : (
+      registrations.map((r) => (
+        <Registration
+          key={r.tailNumber}
+          onClick={this.handleClick(r)}
+          registration={r}
+        />
+      ))
+    );
+  }
 }
 
-const mapStateToProps = state => {
-    const { searchQuery, registrationsByQuery } = state
-    const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
-        isFetching: searchQuery !== '',
-        items: []
-    }
-    return {
-        registrations,
-        isFetching,
-    }
-}
+Suggestions.propTypes = {
+  registrations: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  isFetching: PropTypes.bool.isRequired,
+  selectRegistration: PropTypes.func.isRequired,
+};
 
-export default connect(mapStateToProps)(Suggestions)
+const mapStateToProps = (state) => {
+  const { searchQuery, registrationsByQuery } = state;
+  const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
+    isFetching: searchQuery !== '',
+    items: [],
+  };
+  return {
+    registrations,
+    isFetching,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  selectRegistration: (q) => dispatch(selectedRegistration(q)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Suggestions);

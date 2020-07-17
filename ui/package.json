@@ -9,9 +9,11 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "eslint-config-airbnb": "^18.2.0",
     "prop-types": "^15.7.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-input-autosize": "^2.2.2",
     "react-redux": "^7.2.0",
     "react-scripts": "3.4.1",
     "redux": "^4.0.5",
@@ -19,14 +21,17 @@
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
+    "start": "npm run dev",
     "build": "webpack --mode production",
-    "start": "webpack-dev-server --open --mode development"
+    "dev": "webpack-dev-server --open --mode development",
+    "lint": "eslint \"**/*.js\""
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
     "@babel/plugin-proposal-class-properties": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "^7.10.4",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
     "css-loader": "^3.6.0",
     "html-loader": "^1.1.0",

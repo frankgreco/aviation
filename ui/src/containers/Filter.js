@@ -1,58 +1,106 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import FilterComponent from '../components/Filter.js';
-import { disableSearchFilter, enableSearchFilter } from '../actions'
+import FilterComponent from '../components/Filter';
+import { disableSearchFilter, enableSearchFilter, fetchRegistrationsIfNeeded } from '../actions';
+import { reset, buildQuery } from '../utils/timer';
 
 class Filter extends Component {
-
-    static propTypes = {
-        searchFilters: PropTypes.object,
-        searchQuery: PropTypes.string,
-        disableFilter: PropTypes.func,
-        queryFilter: PropTypes.func,
-        name: PropTypes.string,
-        includeConj: PropTypes.bool
-    }
-
     componentDidMount = () => this.input.focus()
 
-    handleKeyDown = f => e => {
-        switch(e.key) {
-            case 'Backspace':
-                if (this.props.searchFilters[this.props.name].value === '') {
-                    this.props.disableFilter(f)
-                }
-        }
+    handleKeyDown = (f) => (e) => {
+      const { searchFilters, disableFilter, name } = this.props;
+
+      switch (e.key) {
+        case 'Backspace':
+          if (searchFilters[name].value === '') {
+            disableFilter(f);
+          }
+          break;
+        default:
+          break;
+      }
     }
 
-    handleChange = e => this.props.queryFilter(this.props.name, e.target.value)
-
-    render = () => <FilterComponent
-        key={this.props.key}
-        name={this.props.name}
-        onKeyDown={this.handleKeyDown(this.props.name)}
-        onChange={e => {this.handleChange(e)}}
-        value={this.props.searchFilters[this.props.name].value}
-        input={input => { this.input = input; }}
-        includeConj={this.props.includeConj}
-    />
-}
-
-const mapDispatchToProps = dispatch => {
-    return {
-        disableFilter: f => dispatch(disableSearchFilter(f)),
-        queryFilter: (f, q) => dispatch(enableSearchFilter(f, q))
+    shouldFetchRegistrations = (q) => {
+      switch (q.length) {
+        case 0:
+          return false;
+        default:
+          return true;
+      }
     }
-}
 
-const mapStateToProps = state => {
-    const { searchFilters, searchQuery } = state
-
-    return {
+    handleChange = (e) => {
+      const {
+        fetchRegistrations,
         searchFilters,
-        searchQuery
+        name,
+        queryFilter,
+      } = this.props;
+
+      queryFilter(name, e.target.value);
+
+      const query = buildQuery(searchFilters);
+
+      // searchQuery(query)
+      reset(1000, query).then((q) => {
+        if (this.shouldFetchRegistrations(q)) {
+          fetchRegistrations(q);
+        }
+      });
+    }
+
+    handleKeyPress = (e) => {
+      e.target.style.width = `${(4 + (e.target.value.length + 1) * 1)}ch`;
+    }
+
+    render = () => {
+      const {
+        key,
+        name,
+        includeConj,
+        searchFilters,
+      } = this.props;
+
+      return (
+        <FilterComponent
+          key={key}
+          name={name}
+          onKeyDown={this.handleKeyDown(name)}
+          onChange={(e) => { this.handleChange(e); }}
+          value={searchFilters[name].value}
+          input={(input) => { this.input = input; }}
+          includeConj={includeConj}
+          onKeyPress={(e) => { this.handleKeyPress(e); }}
+        />
+      );
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Filter)
+Filter.propTypes = {
+  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  fetchRegistrations: PropTypes.func.isRequired,
+  disableFilter: PropTypes.func.isRequired,
+  queryFilter: PropTypes.func.isRequired,
+  name: PropTypes.string.isRequired,
+  includeConj: PropTypes.bool.isRequired,
+  key: PropTypes.string.isRequired,
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  disableFilter: (f) => dispatch(disableSearchFilter(f)),
+  queryFilter: (f, q) => dispatch(enableSearchFilter(f, q)),
+  fetchRegistrations: (q) => dispatch(fetchRegistrationsIfNeeded(q)),
+});
+
+const mapStateToProps = (state) => {
+  const { searchFilters, searchQuery } = state;
+
+  return {
+    searchFilters,
+    searchQuery,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Filter);

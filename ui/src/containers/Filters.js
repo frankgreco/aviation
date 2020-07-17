@@ -1,36 +1,35 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import Filter from './Filter.js';
+import Filter from './Filter';
 
-class Filters extends Component {
+const Filters = ({ searchFilters }) => {
+  const enabledFilters = Object.keys(searchFilters)
+    .filter((k) => searchFilters[k].enabled)
+    .reduce((obj, key) => {
+      obj[key] = searchFilters[key]; // eslint-disable-line no-param-reassign
+      return obj;
+    }, {});
 
-    static propTypes = {
-        searchFilters: PropTypes.object,
-    }
+  return Object.keys(enabledFilters).map((k, i) => (enabledFilters[k].enabled ? (
+    <Filter
+      key={k}
+      name={k}
+      includeConj={i > 0}
+    />
+  ) : null));
+};
 
-    render = () => {
-        const { searchFilters } = this.props 
+Filters.propTypes = {
+  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+};
 
-        let enabledFilters = Object.keys(searchFilters).filter(k => searchFilters[k].enabled).reduce((obj, key) => {
-            obj[key] = searchFilters[key]
-            return obj
-        }, {}) 
-        
-        return Object.keys(enabledFilters).map((k, i) => enabledFilters[k].enabled ? <Filter
-            key={i}
-            name={k}
-            includeConj={i > 0}
-        /> : null)
-    }
-}
+const mapStateToProps = (state) => {
+  const { searchFilters } = state;
 
-const mapStateToProps = state => {
-    const { searchFilters } = state
+  return {
+    searchFilters,
+  };
+};
 
-    return {
-        searchFilters,
-    }
-}
-
-export default connect(mapStateToProps)(Filters)
+export default connect(mapStateToProps)(Filters);

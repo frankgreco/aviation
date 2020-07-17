@@ -1,4 +1,4 @@
-const HtmlWebPackPlugin = require('@babel/preset-reacthtml-webpack-plugin'); // eslint-disable-line import/no-unresolved
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   module: {

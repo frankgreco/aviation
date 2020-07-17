@@ -8,6 +8,7 @@ import {
 } from '../actions';
 import { buildQuery } from '../utils/timer';
 import SearchComponent from '../components/Search';
+import { registration as registrationProp, searchFilters as searchFiltersProp } from '../common/global_types';
 
 class Search extends Component {
   hasFilters = (f) => Object.keys(f).filter((k) => f[k].enabled).length > 0
@@ -41,7 +42,7 @@ class Search extends Component {
     return (
       <SearchComponent
         query={buildQuery(searchFilters)}
-        registrations={registrations}
+        numRegistrtions={registrations.length}
         handleChange={(e) => { this.handleChange(e); }}
         onClick={this.handleClear}
         isFetching={isFetching}
@@ -64,11 +65,11 @@ Search.propTypes = {
   searchQueryProp: PropTypes.func.isRequired,
   disableFilter: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
-  registrations: PropTypes.array, // eslint-disable-line react/forbid-prop-types
-  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  registrations: PropTypes.arrayOf(registrationProp),
+  searchFilters: searchFiltersProp.isRequired,
   hideCodeView: PropTypes.bool.isRequired,
   toggleCodeView: PropTypes.func.isRequired,
-  selectedRegistration: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  selectedRegistration: registrationProp.isRequired,
 };
 
 const mapStateToProps = (state) => {

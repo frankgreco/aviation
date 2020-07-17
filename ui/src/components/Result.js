@@ -1,6 +1,6 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import '../index.css';
+import { registration as registrationProp } from '../common/global_types';
 
 export default function Result({ registration }) {
   return (
@@ -11,5 +11,5 @@ export default function Result({ registration }) {
 }
 
 Result.propTypes = {
-  registration: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  registration: registrationProp.isRequired,
 };

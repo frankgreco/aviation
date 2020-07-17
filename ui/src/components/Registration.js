@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import AirplanemodeActiveIcon from '@material-ui/icons/AirplanemodeActive';
 import Tag from './Tag';
 import '../index.css';
+import { registration as registrationProp } from '../common/global_types';
 
 export default function Registration({ registration, onClick }) {
   return (
@@ -21,6 +22,6 @@ export default function Registration({ registration, onClick }) {
 }
 
 Registration.propTypes = {
-  registration: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  registration: registrationProp.isRequired,
   onClick: PropTypes.func.isRequired,
 };

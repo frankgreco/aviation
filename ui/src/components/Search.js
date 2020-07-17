@@ -13,10 +13,11 @@ import Result from './Result';
 import Filters from '../containers/Filters';
 import Tray from '../containers/Tray';
 import { allEnabled } from '../utils/timer';
+import { searchFilters as searchFiltersProp, registration } from '../common/global_types';
 
 export default function Search({
   query,
-  registrations,
+  numRegistrtions,
   handleChange,
   onClick,
   isFetching,
@@ -94,7 +95,7 @@ export default function Search({
         ) : null
       }
       <div className="seperator-parent">
-        { registrations.length > 0 && !isFetching ? <div className="seperator" /> : null }
+        { numRegistrtions > 0 && !isFetching ? <div className="seperator" /> : null }
       </div>
       <div className="results-container-parent">
         <div className="results-container">
@@ -111,7 +112,7 @@ export default function Search({
 
 Search.propTypes = {
   query: PropTypes.string.isRequired,
-  registrations: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  numRegistrtions: PropTypes.number.isRequired,
   handleChange: PropTypes.func.isRequired,
   onClick: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
@@ -119,6 +120,6 @@ Search.propTypes = {
   hasFilters: PropTypes.bool.isRequired,
   toggleCodeView: PropTypes.func.isRequired,
   hideCodeView: PropTypes.bool.isRequired,
-  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
-  selectedRegistration: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  searchFilters: searchFiltersProp.isRequired,
+  selectedRegistration: registration.isRequired,
 };

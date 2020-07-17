@@ -4,6 +4,7 @@ import '../index.css';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import Tag from './Tag';
 import { allEnabled } from '../utils/timer';
+import { searchFilters as searchFiltersProp } from '../common/global_types';
 
 const renderTagIfNeeded = (searchFilters, key, onClick) => (searchFilters[key].enabled ? null : (
   <Tag v={key} onClick={onClick(key)} invert />
@@ -28,5 +29,5 @@ export default function Tray({ onClick, searchFilters }) {
 
 Tray.propTypes = {
   onClick: PropTypes.func.isRequired,
-  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  searchFilters: searchFiltersProp.isRequired,
 };

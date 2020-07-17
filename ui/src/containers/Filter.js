@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import FilterComponent from '../components/Filter';
 import { disableSearchFilter, enableSearchFilter, fetchRegistrationsIfNeeded } from '../actions';
 import { reset, buildQuery } from '../utils/timer';
+import { searchFilters as searchFiltersProp } from '../common/global_types';
 
 class Filter extends Component {
     componentDidMount = () => this.input.focus()
@@ -79,7 +80,7 @@ class Filter extends Component {
 }
 
 Filter.propTypes = {
-  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  searchFilters: searchFiltersProp.isRequired,
   fetchRegistrations: PropTypes.func.isRequired,
   disableFilter: PropTypes.func.isRequired,
   queryFilter: PropTypes.func.isRequired,

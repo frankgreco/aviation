@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { enableSearchFilter } from '../actions';
 import TrayComponent from '../components/Tray';
+import { searchFilters as searchFiltersProp } from '../common/global_types';
 
 class Tray extends Component {
   handleClick = (f) => () => {
@@ -23,7 +24,7 @@ class Tray extends Component {
 
 Tray.propTypes = {
   searchFilter: PropTypes.func.isRequired,
-  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  searchFilters: searchFiltersProp.isRequired,
 };
 
 const mapStateToProps = (state) => {

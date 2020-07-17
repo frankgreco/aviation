@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Registration from '../components/Registration';
 import { selectedRegistration } from '../actions';
+import { registration as registrationProp } from '../common/global_types';
 
 class Suggestions extends Component {
   shouldComponentUpdate = (props) => !props.isFetching
@@ -27,7 +28,7 @@ class Suggestions extends Component {
 }
 
 Suggestions.propTypes = {
-  registrations: PropTypes.array.isRequired, // eslint-disable-line react/forbid-prop-types
+  registrations: PropTypes.arrayOf(registrationProp).isRequired,
   isFetching: PropTypes.bool.isRequired,
   selectRegistration: PropTypes.func.isRequired,
 };

@@ -24,7 +24,7 @@ export function allEnabled(searchFilters) {
 }
 
 export function allDisabled(searchFilters) {
-  return !allEnabled(searchFilters);
+  return Object.keys(searchFilters).filter((k) => searchFilters[k].enabled).length === 0;
 }
 
 export function buildQuery(searchFilters) {

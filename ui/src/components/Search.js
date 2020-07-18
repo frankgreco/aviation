@@ -9,10 +9,10 @@ import CodeIcon from '@material-ui/icons/Code';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import Suggestions from '../containers/Suggestions';
-import Result from './Result';
+import Result from '../containers/Result';
 import Filters from '../containers/Filters';
 import Tray from '../containers/Tray';
-import { allEnabled } from '../utils/timer';
+import { allEnabled, allDisabled } from '../utils/timer';
 import { searchFilters as searchFiltersProp, registration } from '../common/global_types';
 
 export default function Search({
@@ -46,12 +46,14 @@ export default function Search({
 
   return (
     <div className="input-and-results">
-      <div className="toggleCodeViewRoot">
-        <span role="button" tabIndex={0} onKeyDown={toggleCodeView} className="toggleCodeViewIcon" onClick={toggleCodeView}>
-          { hideCodeView ? <ExpandMoreIcon fontSize="small" /> : <ExpandLessIcon fontSize="small" />}
-        </span>
-        <span className="toggleCodeViewPadding" />
-      </div>
+      { allDisabled(searchFilters) ? null : (
+        <div className="toggleCodeViewRoot">
+          <span role="button" tabIndex={0} onKeyDown={toggleCodeView} className="toggleCodeViewIcon" onClick={toggleCodeView}>
+            { hideCodeView ? <ExpandMoreIcon fontSize="small" /> : <ExpandLessIcon fontSize="small" />}
+          </span>
+          <span className="toggleCodeViewPadding" />
+        </div>
+      )}
       { hideCodeView ? null : (
         <div className="search-input light no-padding-top no-padding-bottom">
           <div className="search">
@@ -73,19 +75,21 @@ export default function Search({
           </div>
         </div>
       )}
-      <div className={`search-input ${allEnabled(searchFilters) ? 'padding-bottom' : ''}`}>
-        <div className="search">
-          <span className="search-icon">
-            <SearchIcon fontSize="small" />
-          </span>
-          <div className="search-parent">
-            <Filters />
+      { allDisabled(searchFilters) ? null : (
+        <div className={`search-input ${allEnabled(searchFilters) ? 'padding-bottom' : ''}`}>
+          <div className="search">
+            <span className="search-icon">
+              <SearchIcon fontSize="small" />
+            </span>
+            <div className="search-parent">
+              <Filters />
+            </div>
+            <span fontSize="small" className="search-icon">
+              {query.length > 0 || hasFilters ? <ClearIcon onClick={onClick} fontSize="inherit" /> : null}
+            </span>
           </div>
-          <span fontSize="small" className="search-icon">
-            {query.length > 0 || hasFilters ? <ClearIcon onClick={onClick} fontSize="inherit" /> : null}
-          </span>
         </div>
-      </div>
+      )}
       <Tray />
       {
         isFetching ? (

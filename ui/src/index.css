@@ -1,3 +1,15 @@
+@font-face {
+    font-family: 'titleFont';
+    src:    url('./fonts/Kbsticktoit-vJ3M.ttf') format('truetype'),
+            url('./fonts/Kbsticktoit-vJ3M.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'titleFont2';
+    src:    url('./fonts/Kbjellybean-739V.ttf') format('truetype'),
+            url('./fonts/Kbjellybean-739V.ttf') format('truetype');
+}
+
 * {
     margin : 0;
     padding : 0;
@@ -7,7 +19,9 @@
 
 html, body{
     min-width:100%;
-    background-color: #262626;
+    /* background-color: #262626; */
+    /* background-color: #EEEEEE; */
+    background-color: #e0e0e0;
     overflow: hidden;
 }
 
@@ -21,6 +35,8 @@ html, body{
 
 .home-item.top {
     flex: 3;
+    display: inline-flex;
+    justify-content: center;
 }
 
 .home-item.middle {
@@ -46,7 +62,8 @@ html, body{
 }
 
 .input-and-results {
-    background-color: #4D4D4D;
+    /* background-color: #4D4D4D; */
+    background-color: #e0e0e0;
     overflow: auto;
     display: flex;
     flex-direction: column;
@@ -54,7 +71,8 @@ html, body{
     position: absolute;
     width: 40%;
     z-index: 1; /* bring to front */
-    box-shadow: 10px 10px 15px 5px #222;
+    /* box-shadow: 10px 10px 15px 5px #222; */
+    box-shadow: 5px 5px 15px 0 rgba(38, 38, 38, 0.2), -5px -5px 15px 0 rgba(255, 255, 255, 0.5);
 }
 
 .frank {
@@ -62,7 +80,7 @@ html, body{
 }
 
 .toggleCodeViewRoot {
-    padding: 0 1vh;
+    padding: 0 2vh;
     display: flex;
     flex-direction: row;
     background-color: #EEEEEE;
@@ -91,11 +109,11 @@ html, body{
 
 .search-input {
     flex: 1;
-    padding-top: 1vh;
+    padding-top: 2vh;
 }
 
 .padding-bottom {
-    padding-bottom: 1vh;
+    padding-bottom: 2vh;
 }
 
 .seperator-parent {
@@ -125,7 +143,7 @@ html, body{
     flex-wrap: wrap;
     flex: 30;
     padding-left: 5px;
-    padding-top: 1vh;
+    padding-top: 2vh;
 }
 
 .results-container {
@@ -139,14 +157,14 @@ html, body{
 }
 
 .search-icon {
-    color: #EEEEEE;
+    color: #262626;
     align-items: center;
     display: inline-flex;
     justify-content: center;
     flex: 3; 
-    padding-left: 1vh;
-    padding-top: 1vh;
-    padding-bottom: 1vh;
+    padding-left: 2vh;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
 }
 
 .plane {
@@ -162,14 +180,14 @@ html, body{
     flex: 1;
     flex-direction: row;
     justify-content: flex-start;
-    padding: 0vh 1vh 1vh 1vh;
+    padding: 2vh 2vh 2vh 2vh;
 }
 
 .filters-item {
     flex: 3;
     align-items: center;
     justify-content: center;
-    color: #EEEEEE;
+    color: #262626;
     display: inline-flex;
 }
 
@@ -224,7 +242,7 @@ html, body{
     display: flex;
     flex-direction: row;
     justify-content: flex-start; 
-    margin-bottom: 1vh;
+    margin-bottom: 2vh;
 }
 
 .tag-input {
@@ -238,6 +256,21 @@ html, body{
     background-color: #262626;
 }
 
+.title {
+    font-family: 'titleFont', Fallback, sans-serif;
+    font-size: 10em;
+    display: inline-flex;
+    align-items: flex-end;
+    /* color: #262626 */
+    text-shadow: 
+   -8px -8px 12px rgba(255,255,255,0.4),
+   8px 8px 12px rgba(0,0,0,0.08);
+
+   caret-color:#262626;
+   outline: none;
+   color: #262626;
+}
+
 .test-tag {
     display: flex;
     justify-content: center;
@@ -245,6 +278,7 @@ html, body{
 
 .test-input-parent {
     background-color: #4D4D4D;
+    display: inline-flex;
 }
 
 .test-input {
@@ -253,11 +287,12 @@ html, body{
     color: white;
     font-family: "Roboto";
     font-weight: 400;
-    font-size: 0.65em;
+    font-size: 0.8em;
     padding: 5px;
     width: 5ch;
     /* FIX ME */
     max-width: 25ch; 
+    vertical-align: middle;
 }
 
 .raw-input {
@@ -273,8 +308,15 @@ html, body{
     font-weight: 400;
 }
 
-.result {
-    border: 5px solid red;
+.result-container {
+    padding: 2vh;
+}
+
+.result-card {
+    /* border: 5px solid #EEEEEE; */
+    background-color: #EEEEEE;
+    margin-bottom: 5px;
+    border-radius: 3px;
 }
 
 .search input::placeholder {
@@ -294,24 +336,37 @@ input:focus, textarea:focus, select:focus{
 }
 
 .label {
+    /* box-shadow: inset 6px 6px 10px 0 rgba(0, 0, 0, 0.2),
+    inset -6px -6px 10px 0 rgba(255, 255, 255, 0.5); */
     color: #262626;
     white-space: nowrap;
     text-align:center;
     border-radius: 5px;
     font-family: "Roboto";
     font-weight: 400;
-    font-size: 0.65em;
+    /* font-size: 0.65em; */
+    font-size: .8em;
     justify-content: flex-start;
     flex: 0 1 auto;
     display: inline-flex;
     align-items: center;
     background-color: #EEEEEE;
-    padding: 5px; /* FIXME */
+    padding: 1vh; /* FIXME */
 }
 
 .label.invert {
     background-color: #262626;
+    /* box-shadow: inset 3px 3px 5px 0 rgba(0, 0, 0, 0.2),
+    inset -3px -3px 5px 0 rgba(255, 255, 255, 0.5); */
+
+    /* background: linear-gradient(
+    -45deg,
+    rgba(0, 0, 0, 0.2),
+    rgba(255, 255, 255, 0.3)
+  ); */
+
     color: #EEEEEE;
+    /* color: #262626; */
 }
 
 .seperator {
@@ -325,7 +380,7 @@ input:focus, textarea:focus, select:focus{
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
-    padding: 1vh;
+    padding: 2vh;
 }
 
 .container:hover {

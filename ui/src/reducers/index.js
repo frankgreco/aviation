@@ -7,12 +7,15 @@ import {
   DISABLE_SEARCH_FILTER,
   HIDE_CODE_VIEW,
   SELECTED_REGISTRATION,
+  CLEAR_SELECTED_REGISTRATION,
 } from '../actions';
 
 function selectedRegistration(state = {}, action) {
   switch (action.type) {
     case SELECTED_REGISTRATION:
       return { ...state, ...action.value };
+    case CLEAR_SELECTED_REGISTRATION:
+      return {};
     default:
       return state;
   }

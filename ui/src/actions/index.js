@@ -1,5 +1,10 @@
 import axios from 'axios';
 
+export const CLEAR_SELECTED_REGISTRATION = 'CLEAR_SELECTED_REGISTRATION';
+export function clearSelectedRegistration() {
+  return { type: CLEAR_SELECTED_REGISTRATION };
+}
+
 export const SELECTED_REGISTRATION = 'SELECTED_REGISTRATION';
 export function selectedRegistration(value) {
   return { type: SELECTED_REGISTRATION, value };
@@ -45,7 +50,7 @@ export function fetchRegistrations(value) {
     dispatch(requestRegistrations(value));
     return axios.get('https://5sh4xcm7m8.execute-api.us-west-2.amazonaws.com/Prod/search', {
       params: {
-        q: btoa(value), // eslint-disable-line no-undef
+        q: btoa(value),
         limit: 10,
       },
     }).then((response) => dispatch(receiveRegistrations(value, response.data)));

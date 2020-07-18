@@ -18,6 +18,6 @@ export const searchFilters = PropTypes.shape({
 export const registration = PropTypes.shape({
   n_number: PropTypes.string.isRequired,
   make: PropTypes.string.isRequired,
-  model: PropTypes.string.isRequired,
-  year_manufactured: PropTypes.number.isRequired,
+  Model: PropTypes.string.isRequired,
+  year_manufactured: PropTypes.string.isRequired,
 });

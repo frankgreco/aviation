@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import '../index.css';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
+import SearchIcon from '@material-ui/icons/Search';
 import Tag from './Tag';
-import { allEnabled } from '../utils/timer';
+import { allEnabled, allDisabled } from '../utils/timer';
 import { searchFilters as searchFiltersProp } from '../common/global_types';
 
 const renderTagIfNeeded = (searchFilters, key, onClick) => (searchFilters[key].enabled ? null : (
@@ -14,7 +15,7 @@ export default function Tray({ onClick, searchFilters }) {
   return allEnabled(searchFilters) ? null : (
     <div className="filters-parent">
       <div className="filters-item">
-        <LabelOutlinedIcon fontSize="small" />
+        { allDisabled(searchFilters) ? <SearchIcon fontSize="small" /> : <LabelOutlinedIcon fontSize="small" /> }
       </div>
       <div className="filters">
         {renderTagIfNeeded(searchFilters, 'tail number', onClick)}

@@ -33,7 +33,6 @@ class Search extends Component {
   render = () => {
     const {
       searchFilters,
-      registrations,
       isFetching,
       hideCodeView,
       selectedRegistration,
@@ -42,7 +41,6 @@ class Search extends Component {
     return (
       <SearchComponent
         query={buildQuery(searchFilters)}
-        numRegistrtions={registrations.length}
         handleChange={(e) => { this.handleChange(e); }}
         onClick={this.handleClear}
         isFetching={isFetching}
@@ -57,15 +55,10 @@ class Search extends Component {
   }
 }
 
-Search.defaultProps = {
-  registrations: [],
-};
-
 Search.propTypes = {
   searchQueryProp: PropTypes.func.isRequired,
   disableFilter: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
-  registrations: PropTypes.arrayOf(registrationProp),
   searchFilters: searchFiltersProp.isRequired,
   hideCodeView: PropTypes.bool.isRequired,
   toggleCodeView: PropTypes.func.isRequired,
@@ -80,13 +73,12 @@ const mapStateToProps = (state) => {
     hideCodeView,
     selectedRegistration,
   } = state;
-  const { isFetching, items: registrations } = registrationsByQuery[searchQuery] || {
+  const { isFetching } = registrationsByQuery[searchQuery] || {
     isFetching: false,
   };
 
   return {
     isFetching,
-    registrations,
     searchFilters,
     hideCodeView,
     selectedRegistration,

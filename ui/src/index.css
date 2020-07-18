@@ -53,6 +53,13 @@ html, body{
     justify-content: center;
 }
 
+.github {
+    display: inline-flex;
+    align-items: flex-end;
+    color: #262626;
+    padding: 2vh;
+}
+
 .search-container {
     display: flex;
     flex-direction: row;

@@ -17,7 +17,6 @@ import { searchFilters as searchFiltersProp, registration } from '../common/glob
 
 export default function Search({
   query,
-  numRegistrtions,
   handleChange,
   onClick,
   isFetching,
@@ -98,9 +97,6 @@ export default function Search({
           </ThemeProvider>
         ) : null
       }
-      <div className="seperator-parent">
-        { numRegistrtions > 0 && !isFetching ? <div className="seperator" /> : null }
-      </div>
       <div className="results-container-parent">
         <div className="results-container">
           { Object.entries(selectedRegistration).length === 0 ? (
@@ -116,7 +112,6 @@ export default function Search({
 
 Search.propTypes = {
   query: PropTypes.string.isRequired,
-  numRegistrtions: PropTypes.number.isRequired,
   handleChange: PropTypes.func.isRequired,
   onClick: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,

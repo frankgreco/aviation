@@ -30,15 +30,6 @@ class Filter extends Component {
       }
     }
 
-    shouldFetchRegistrations = (q) => {
-      switch (q.length) {
-        case 0:
-          return false;
-        default:
-          return true;
-      }
-    }
-
     handleChange = (e, id) => {
       const {
         fetchRegistrations,
@@ -51,9 +42,8 @@ class Filter extends Component {
 
       const query = buildQuery(searchFilters);
 
-      // searchQuery(query)
       reset(1000, query).then((q) => {
-        if (this.shouldFetchRegistrations(q)) {
+        if (q.length > 0) {
           fetchRegistrations(q);
         }
       });
@@ -67,7 +57,8 @@ class Filter extends Component {
       this.setState({ isFocused: false });
     }
 
-    handleOnFocus = () => {
+    handleOnFocus = (e) => {
+      e.target.style.width = `${(4 + (e.target.value.length + 1) * 1)}ch`;
       this.setState({ isFocused: true });
     }
 
@@ -87,8 +78,8 @@ class Filter extends Component {
           name={name}
           value={value}
           when={when}
-          onBlur={this.handleOnBlur}
-          onFocus={this.handleOnFocus}
+          onBlur={(e) => { this.handleOnBlur(e); }}
+          onFocus={(e) => { this.handleOnFocus(e); }}
           isFocused={isFocused}
           onKeyDown={this.handleKeyDown(name)}
           onChange={(e) => { this.handleChange(e, when); }}

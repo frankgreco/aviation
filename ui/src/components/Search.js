@@ -43,7 +43,7 @@ export default function Search({
   });
 
   return (
-    <div className="input-and-results">
+    <div className="w3-col l6 m8 s10 input-and-results">
       { Object.keys(searchFilters).length === 0 ? null : (
         <div className="toggleCodeViewRoot">
           <span role="button" tabIndex={0} onKeyDown={toggleCodeView} className="toggleCodeViewIcon" onClick={toggleCodeView}>

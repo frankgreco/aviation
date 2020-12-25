@@ -27,7 +27,7 @@
     "start": "npm run dev",
     "build": "webpack --mode production",
     "dev": "webpack-dev-server --open --mode development",
-    "lint": "eslint \"**/*.js\""
+    "lint": "eslint \"src/\" && npx stylelint \"**/*.css\""
   },
   "devDependencies": {
     "@babel/core": "^7.10.4",
@@ -39,6 +39,9 @@
     "css-loader": "^3.6.0",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
+    "stylelint": "^13.8.0",
+    "stylelint-config-standard": "^20.0.0",
+    "stylelint-order": "^4.1.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"

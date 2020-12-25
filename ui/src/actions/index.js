@@ -16,13 +16,22 @@ export function hideCodeView(value) {
 }
 
 export const ENABLE_SEARCH_FILTER = 'ENABLE_SEARCH_FILTER';
-export function enableSearchFilter(filter, query = '') {
-  return { type: ENABLE_SEARCH_FILTER, filter, query };
+export function enableSearchFilter(filter, when, query = '') {
+  return {
+    type: ENABLE_SEARCH_FILTER, when, filter, query,
+  };
+}
+
+export const CLEAR_SEARCH_FILTERS = 'CLEAR_SEARCH_FILTERS';
+export function clearSearchFilters() {
+  return { type: CLEAR_SEARCH_FILTERS };
 }
 
 export const DISABLE_SEARCH_FILTER = 'DISABLE_SEARCH_FILTER';
-export function disableSearchFilter(filter, query = '') {
-  return { type: DISABLE_SEARCH_FILTER, filter, query };
+export function disableSearchFilter(filter, when, query = '') {
+  return {
+    type: DISABLE_SEARCH_FILTER, filter, when, query,
+  };
 }
 
 export const SEARCH_QUERY = 'SEARCH_QUERY';

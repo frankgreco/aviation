@@ -4,24 +4,21 @@ import '../index.css';
 import LabelOutlinedIcon from '@material-ui/icons/LabelOutlined';
 import SearchIcon from '@material-ui/icons/Search';
 import Tag from './Tag';
-import { allEnabled, allDisabled } from '../utils/timer';
 import { searchFilters as searchFiltersProp } from '../common/global_types';
 
-const renderTagIfNeeded = (searchFilters, key, onClick) => (searchFilters[key].enabled ? null : (
-  <Tag v={key} onClick={onClick(key)} invert />
-));
-
 export default function Tray({ onClick, searchFilters }) {
-  return allEnabled(searchFilters) ? null : (
+  return (
     <div className="filters-parent">
       <div className="filters-item">
-        { allDisabled(searchFilters) ? <SearchIcon fontSize="small" /> : <LabelOutlinedIcon fontSize="small" /> }
+        <div className="search-icon-parent foobar">
+          { Object.keys(searchFilters).length === 0 ? <SearchIcon fontSize="small" /> : <LabelOutlinedIcon fontSize="small" /> }
+        </div>
       </div>
       <div className="filters">
-        {renderTagIfNeeded(searchFilters, 'tail number', onClick)}
-        {renderTagIfNeeded(searchFilters, 'make', onClick)}
-        {renderTagIfNeeded(searchFilters, 'model', onClick)}
-        {renderTagIfNeeded(searchFilters, 'airline', onClick)}
+        <Tag k="tail number" v="tail number" onClick={onClick('tail number')} invert />
+        <Tag k="make" v="make" onClick={onClick('make')} invert />
+        <Tag k="model" v="model" onClick={onClick('model')} invert />
+        <Tag k="airline" v="airline" onClick={onClick('airline')} invert />
       </div>
       <div className="filters-item" />
     </div>

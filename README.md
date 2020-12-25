@@ -1,6 +1,12 @@
 # aviation
 ![deploy](https://github.com/frankgreco/aviation/workflows/deploy/badge.svg)
 
+## ui
+```
+$ cd ui
+$ npm run start
+$ open localhost:8000
+```
 
 ## download
 

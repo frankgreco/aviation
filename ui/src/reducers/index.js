@@ -8,6 +8,7 @@ import {
   HIDE_CODE_VIEW,
   SELECTED_REGISTRATION,
   CLEAR_SELECTED_REGISTRATION,
+  CLEAR_SEARCH_FILTERS,
 } from '../actions';
 
 function selectedRegistration(state = {}, action) {
@@ -39,37 +40,31 @@ function hideCodeView(state = true, action) {
   }
 }
 
-function searchFilters(state = {
-  enabled: false,
-  value: '',
-}, action) {
+function searchFilters(state = {}, action) {
   switch (action.type) {
+    case CLEAR_SEARCH_FILTERS:
+      return {};
     case ENABLE_SEARCH_FILTER:
       return {
         ...state,
-        [action.filter]: {
-          ...state[action.filter],
-          enabled: true,
+        [action.when]: {
+          key: action.filter,
           value: action.query,
         },
       };
-    case DISABLE_SEARCH_FILTER:
-      return {
-        ...state,
-        [action.filter]: { ...state[action.filter], ...{ enabled: false, value: '' } },
-      };
+    case DISABLE_SEARCH_FILTER: {
+      const { [action.when]: _, ...trimmed } = state;
+      return trimmed;
+    }
     default:
       return state;
   }
 }
 
-function registrations(
-  state = {
-    isFetching: false,
-    items: [],
-  },
-  action,
-) {
+function registrations(state = {
+  isFetching: false,
+  items: [],
+}, action) {
   switch (action.type) {
     case REQUEST_REGISTRATIONS:
       return { ...state, isFetching: true };

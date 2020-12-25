@@ -36,7 +36,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  searchFilter: (f) => dispatch(enableSearchFilter(f)),
+  searchFilter: (f) => dispatch(enableSearchFilter(f, Date.now())),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Tray);

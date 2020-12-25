@@ -12,7 +12,6 @@ import Suggestions from '../containers/Suggestions';
 import Result from '../containers/Result';
 import Filters from '../containers/Filters';
 import Tray from '../containers/Tray';
-import { allEnabled, allDisabled } from '../utils/timer';
 import { searchFilters as searchFiltersProp, registration } from '../common/global_types';
 
 export default function Search({
@@ -45,7 +44,7 @@ export default function Search({
 
   return (
     <div className="input-and-results">
-      { allDisabled(searchFilters) ? null : (
+      { Object.keys(searchFilters).length === 0 ? null : (
         <div className="toggleCodeViewRoot">
           <span role="button" tabIndex={0} onKeyDown={toggleCodeView} className="toggleCodeViewIcon" onClick={toggleCodeView}>
             { hideCodeView ? <ExpandMoreIcon fontSize="small" /> : <ExpandLessIcon fontSize="small" />}
@@ -74,12 +73,14 @@ export default function Search({
           </div>
         </div>
       )}
-      { allDisabled(searchFilters) ? null : (
-        <div className={`search-input ${allEnabled(searchFilters) ? 'padding-bottom' : ''}`}>
+      { Object.keys(searchFilters).length === 0 ? null : (
+        <div className="search-input">
           <div className="search">
-            <span className="search-icon">
-              <SearchIcon fontSize="small" />
-            </span>
+            <div className="filters-item">
+              <div className="search-icon-parent foobar">
+                <SearchIcon fontSize="small" />
+              </div>
+            </div>
             <div className="search-parent">
               <Filters />
             </div>

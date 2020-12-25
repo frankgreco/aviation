@@ -7,15 +7,22 @@ import { reset, buildQuery } from '../utils/timer';
 import { searchFilters as searchFiltersProp } from '../common/global_types';
 
 class Filter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isFocused: true,
+    };
+  }
+
     componentDidMount = () => this.input.focus()
 
     handleKeyDown = (f) => (e) => {
-      const { searchFilters, disableFilter, name } = this.props;
+      const { searchFilters, disableFilter, when } = this.props;
 
       switch (e.key) {
         case 'Backspace':
-          if (searchFilters[name].value === '') {
-            disableFilter(f);
+          if (searchFilters[when].value === '') {
+            disableFilter(f, when);
           }
           break;
         default:
@@ -32,7 +39,7 @@ class Filter extends Component {
       }
     }
 
-    handleChange = (e) => {
+    handleChange = (e, id) => {
       const {
         fetchRegistrations,
         searchFilters,
@@ -40,7 +47,7 @@ class Filter extends Component {
         queryFilter,
       } = this.props;
 
-      queryFilter(name, e.target.value);
+      queryFilter(name, id, e.target.value);
 
       const query = buildQuery(searchFilters);
 
@@ -56,23 +63,36 @@ class Filter extends Component {
       e.target.style.width = `${(4 + (e.target.value.length + 1) * 1)}ch`;
     }
 
+    handleOnBlur = () => {
+      this.setState({ isFocused: false });
+    }
+
+    handleOnFocus = () => {
+      this.setState({ isFocused: true });
+    }
+
     render = () => {
       const {
-        key,
         name,
-        includeConj,
-        searchFilters,
+        value,
+        when,
       } = this.props;
+
+      const {
+        isFocused,
+      } = this.state;
 
       return (
         <FilterComponent
-          key={key}
           name={name}
+          value={value}
+          when={when}
+          onBlur={this.handleOnBlur}
+          onFocus={this.handleOnFocus}
+          isFocused={isFocused}
           onKeyDown={this.handleKeyDown(name)}
-          onChange={(e) => { this.handleChange(e); }}
-          value={searchFilters[name].value}
+          onChange={(e) => { this.handleChange(e, when); }}
           input={(input) => { this.input = input; }}
-          includeConj={includeConj}
           onKeyPress={(e) => { this.handleKeyPress(e); }}
         />
       );
@@ -84,14 +104,14 @@ Filter.propTypes = {
   fetchRegistrations: PropTypes.func.isRequired,
   disableFilter: PropTypes.func.isRequired,
   queryFilter: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  includeConj: PropTypes.bool.isRequired,
-  key: PropTypes.string.isRequired,
+  when: PropTypes.string.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  disableFilter: (f) => dispatch(disableSearchFilter(f)),
-  queryFilter: (f, q) => dispatch(enableSearchFilter(f, q)),
+  disableFilter: (f, w) => dispatch(disableSearchFilter(f, w)),
+  queryFilter: (f, w, q) => dispatch(enableSearchFilter(f, w, q)),
   fetchRegistrations: (q) => dispatch(fetchRegistrationsIfNeeded(q)),
 });
 

@@ -5,28 +5,24 @@ import {
   searchQuery as searchQueryAction,
   disableSearchFilter,
   hideCodeView as hideCodeViewAction,
+  clearSearchFilters as clearSearchFiltersAction,
 } from '../actions';
 import { buildQuery } from '../utils/timer';
 import SearchComponent from '../components/Search';
 import { registration as registrationProp, searchFilters as searchFiltersProp } from '../common/global_types';
 
 class Search extends Component {
-  hasFilters = (f) => Object.keys(f).filter((k) => f[k].enabled).length > 0
+  hasFilters = (f) => Object.keys(f).length > 0
 
   handleClear = () => {
-    const { searchQueryProp, disableFilter } = this.props;
+    const { searchQueryProp, clearSearchFilters } = this.props;
 
     searchQueryProp('');
-    // there has to be a better way to do this
-    disableFilter('make');
-    disableFilter('model');
-    disableFilter('airline');
-    disableFilter('tail number');
+    clearSearchFilters();
   }
 
   toggleCodeView = () => {
     const { toggleCodeView, hideCodeView } = this.props;
-
     toggleCodeView(!hideCodeView);
   }
 
@@ -57,7 +53,7 @@ class Search extends Component {
 
 Search.propTypes = {
   searchQueryProp: PropTypes.func.isRequired,
-  disableFilter: PropTypes.func.isRequired,
+  clearSearchFilters: PropTypes.func.isRequired,
   isFetching: PropTypes.bool.isRequired,
   searchFilters: searchFiltersProp.isRequired,
   hideCodeView: PropTypes.bool.isRequired,
@@ -89,6 +85,7 @@ const mapDispatchToProps = (dispatch) => ({
   searchQueryProp: (q) => dispatch(searchQueryAction(q)),
   disableFilter: (f) => dispatch(disableSearchFilter(f)),
   toggleCodeView: (f) => dispatch(hideCodeViewAction(f)),
+  clearSearchFilters: (f) => dispatch(clearSearchFiltersAction(f)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Search);

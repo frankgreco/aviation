@@ -1,27 +1,19 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Filter from './Filter';
+import { searchFilters as searchFiltersProp } from '../common/global_types';
 
-const Filters = ({ searchFilters }) => {
-  const enabledFilters = Object.keys(searchFilters)
-    .filter((k) => searchFilters[k].enabled)
-    .reduce((obj, key) => {
-      obj[key] = searchFilters[key]; // eslint-disable-line no-param-reassign
-      return obj;
-    }, {});
-
-  return Object.keys(enabledFilters).map((k, i) => (enabledFilters[k].enabled ? (
-    <Filter
-      key={k}
-      name={k}
-      includeConj={i > 0}
-    />
-  ) : null));
-};
+const Filters = ({ searchFilters }) => Object.keys(searchFilters).map((f) => ( // eslint-disable-line max-len
+  <Filter
+    key={`${searchFilters[f].key}-${searchFilters[f].value}-${searchFilters[f].when}`}
+    name={searchFilters[f].key}
+    value={searchFilters[f].value}
+    when={f}
+  />
+));
 
 Filters.propTypes = {
-  searchFilters: PropTypes.object.isRequired, // eslint-disable-line react/forbid-prop-types
+  searchFilters: searchFiltersProp.isRequired,
 };
 
 const mapStateToProps = (state) => {

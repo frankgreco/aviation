@@ -15,7 +15,6 @@ export default function Registration({ registration, onClick }) {
         <Tag k="n-number" v={registration.n_number} />
         <Tag k="make" v={registration.make} />
         <Tag k="model" v={registration.Model} />
-        <Tag k="year" v={registration.year_manufactured} />
       </div>
     </div>
   );

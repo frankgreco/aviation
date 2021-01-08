@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+
+package types;
+
+option go_package = ".;types";
+
+service SuggestionService {
+    rpc ListSuggestions(ListSuggestionsRequest) returns (ListSuggestionsReply) {
+        option (google.api.http) = {
+			get: "/v1/suggestions"
+		};
+    }
+}
+
+message ListSuggestionsRequest {
+    Filter requested = 1;
+    repeated Filter existing = 2;
+}
+
+message ListSuggestionsReply {
+    FilterType type = 1;
+    repeated string suggestions = 2;
+}
+
+enum FilterType {
+    UNKNOWN = 0;
+    N_NUMBER = 1;
+    MAKE = 2;
+    MODEL = 3;
+    AIRLINE = 4;
+}
+
+message Filter {
+    FilterType type = 1;
+    string value = 2;
+}

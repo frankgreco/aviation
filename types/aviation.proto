@@ -15,13 +15,15 @@ service SuggestionService {
 }
 
 message ListSuggestionsRequest {
-    Filter requested = 1;
-    repeated Filter existing = 2;
+    string requested = 1;
+    repeated string existing = 2;
+    int32 size = 3;
 }
 
 message ListSuggestionsReply {
     FilterType type = 1;
     repeated string suggestions = 2;
+    int32 size = 3;
 }
 
 enum FilterType {
@@ -30,9 +32,4 @@ enum FilterType {
     MAKE = 2;
     MODEL = 3;
     AIRLINE = 4;
-}
-
-message Filter {
-    FilterType type = 1;
-    string value = 2;
 }

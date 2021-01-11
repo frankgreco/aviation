@@ -58,11 +58,15 @@ func (s *grpcServer) Run() error {
 }
 
 func (s *grpcServer) Close(error) error {
-	s.options.Server.GracefulStop()
-	// https://golang.org/src/net/error_test.go#L501
-	if err := s.listener.Close(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
-		s.options.Logger.Error(fmt.Sprintf("error closing gRPC listener: %s", err.Error()))
-		return err
+	if s.options.Server != nil {
+		s.options.Server.GracefulStop()
+	}
+	if s.listener != nil {
+		// https://golang.org/src/net/error_test.go#L501
+		if err := s.listener.Close(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
+			s.options.Logger.Error(fmt.Sprintf("error closing gRPC listener: %s", err.Error()))
+			return err
+		}
 	}
 	s.options.Logger.Info("closed grpc server")
 	return nil

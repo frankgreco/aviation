@@ -7,7 +7,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 
@@ -22,10 +21,12 @@ func main() {
 	ctx := context.Background()
 	logger := zap.NewExample().Sugar()
 
-	conn, err := sqlx.Open("pgx", os.Getenv("CONNECTION_STRING"))
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
-		os.Exit(1)
+	var dbRunnable run.Runnable
+	{
+		dbRunnable = db.Prepare(&db.Options{
+			ConnectionString: os.Getenv("CONNECTION_STRING"),
+			Logger:           logger,
+		})
 	}
 
 	var grpcRunnable run.Runnable
@@ -33,7 +34,7 @@ func main() {
 		s := grpc.NewServer()
 		types.RegisterSuggestionServiceServer(s, newSuggestionServer(&suggestionServerConfig{
 			db: &db.DB{
-				DB:     conn,
+				DB:     dbRunnable.(*db.DB).DB,
 				Logger: logger,
 			},
 			logger: logger,
@@ -67,6 +68,7 @@ func main() {
 
 	g.Add(run.Always, grpcRunnable)
 	g.Add(run.Always, httpRunnable)
+	g.Add(run.Always, dbRunnable)
 	g.Add(run.Always, run.NewMonitor(ctx, logger))
 
 	if err := g.Run(); err != nil {

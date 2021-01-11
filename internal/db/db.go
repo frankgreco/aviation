@@ -12,6 +12,7 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/frankgreco/aviation/internal/log"
+	"github.com/frankgreco/aviation/internal/run"
 )
 
 var (
@@ -21,6 +22,62 @@ var (
 type DB struct {
 	*sqlx.DB
 	Logger log.Logger
+	err    error
+	cancel context.CancelFunc
+	ctx    context.Context
+}
+
+type Options struct {
+	ConnectionString string
+	Logger           log.Logger
+}
+
+func Prepare(opts *Options) run.Runnable {
+	runnable := new(DB)
+
+	conn, err := sqlx.Open("pgx", opts.ConnectionString)
+	if err != nil {
+		runnable.err = err
+		return runnable
+	}
+
+	runnable.ctx, runnable.cancel = context.WithCancel(context.Background())
+	runnable.DB = conn
+	runnable.Logger = opts.Logger
+
+	return runnable
+}
+
+func (p *DB) Run() error {
+	if p.err != nil {
+		err := fmt.Errorf("error starting databas: %s", p.err.Error())
+		p.Logger.Error(err.Error())
+		return err
+	}
+
+	// TODO: investigate why first ping always succeeds.
+	p.Ping()
+
+	if err := p.Ping(); err != nil {
+		p.Logger.Error(fmt.Sprintf("error connecting to database: %s", err.Error()))
+		return nil // We don't have to return the actual error here.
+	}
+
+	p.Logger.Info("successfully connected to database")
+
+	<-p.ctx.Done()
+	return nil
+}
+
+func (p *DB) Close(error) error {
+	p.cancel()
+	if err := p.DB.Close(); err != nil {
+		err := fmt.Errorf("error closing databas: %s", p.err.Error())
+		p.Logger.Error(err.Error())
+		return err
+	}
+	p.Logger.Info("successfully closed connection to database")
+	return nil
 }
 
 type ScanFunc func(*sqlx.Rows) ([]interface{}, error)

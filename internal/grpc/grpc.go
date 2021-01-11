@@ -2,12 +2,14 @@ package grpc
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"net"
+	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/frankgreco/aviation/internal/log"
 	"github.com/frankgreco/aviation/internal/run"
 )
 
@@ -16,6 +18,7 @@ type Options struct {
 	Network    string
 	Address    string
 	Reflection bool
+	Logger     log.Logger
 }
 
 type grpcServer struct {
@@ -50,13 +53,17 @@ func (s *grpcServer) Run() error {
 		return s.err
 	}
 
-	log.Printf("grpc server listening on %s\n", s.listener.Addr().String())
-
+	s.options.Logger.Info(fmt.Sprintf("grpc server listening on %s", s.listener.Addr().String()))
 	return s.options.Server.Serve(s.listener)
 }
 
-func (s *grpcServer) Close(err error) error {
-	log.Println("closing grpc server")
-	defer s.options.Server.GracefulStop()
-	return s.listener.Close()
+func (s *grpcServer) Close(error) error {
+	s.options.Server.GracefulStop()
+	// https://golang.org/src/net/error_test.go#L501
+	if err := s.listener.Close(); err != nil && !strings.Contains(err.Error(), "use of closed network connection") {
+		s.options.Logger.Error(fmt.Sprintf("error closing gRPC listener: %s", err.Error()))
+		return err
+	}
+	s.options.Logger.Info("closed grpc server")
+	return nil
 }

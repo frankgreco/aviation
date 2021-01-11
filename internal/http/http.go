@@ -125,6 +125,9 @@ func (params *serverParams) Close(error) error {
 	if err := closeServer(params.options.Logger, params.insecureServer, params.options.Name, "HTTP"); err != nil {
 		params.err = append(params.err, err.Error())
 	}
+	if params.err == nil || len(params.err) == 0 {
+		return nil
+	}
 	return errors.New(strings.Join(params.err, ", "))
 }
 

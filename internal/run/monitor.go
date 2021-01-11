@@ -2,19 +2,22 @@ package run
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/frankgreco/aviation/internal/log"
 )
 
 type process struct {
 	ctx     context.Context
 	cancel  context.CancelFunc
 	signals chan os.Signal
+	logger  log.Logger
 }
 
-func NewMonitor(parent context.Context) Runnable {
+func NewMonitor(parent context.Context, logger log.Logger) Runnable {
 	ctx, cancel := context.WithCancel(parent)
 	signals := make(chan os.Signal, 2)
 
@@ -22,20 +25,21 @@ func NewMonitor(parent context.Context) Runnable {
 		ctx:     ctx,
 		cancel:  cancel,
 		signals: signals,
+		logger:  logger,
 	}
 }
 
 func (p *process) Run() error {
-	log.Println("starting parent process monitor")
+	p.logger.Info("starting parent process monitor")
 
 	signal.Notify(p.signals, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
 		firstSignal := <-p.signals
-		log.Printf("received %s signal", firstSignal.String())
+		p.logger.Info(fmt.Sprintf("received %s signal", firstSignal.String()))
 		p.cancel()
 		secondSignal := <-p.signals
-		log.Printf("received %s signal", secondSignal.String())
+		p.logger.Info(fmt.Sprintf("received %s signal", secondSignal.String()))
 		os.Exit(1) // second signal. Exit directly.
 	}()
 
@@ -44,7 +48,7 @@ func (p *process) Run() error {
 }
 
 func (p *process) Close(error) error {
-	log.Println("closing parent process monitor")
+	p.logger.Info("closing parent process monitor")
 	p.cancel()
 	return nil
 }

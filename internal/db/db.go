@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/Masterminds/squirrel"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/frankgreco/aviation/internal/log"
 )
@@ -35,7 +35,7 @@ type QueryScanConfig struct {
 }
 
 type QueryScan struct {
-	Name      string // Explicit name of query used for logging purposes.
+	Name      string           // Explicit name of query used for logging purposes.
 	Query     squirrel.Sqlizer // An alternative to Query in cases where queries are dynamically constructed using closure.
 	QueryFunc QueryFunc
 	Callback  ScanFunc

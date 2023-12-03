@@ -34,7 +34,7 @@ Resources:
         Type: AWS::Serverless::Function
         Properties:
             Runtime: provided.al2
-            Handler: download/download
+            Handler: download/bootstrap
             Timeout: 300
             CodeUri: .
             MemorySize: 2048

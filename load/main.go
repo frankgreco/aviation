@@ -63,7 +63,7 @@ func do(ctx context.Context) error {
 
 	runnable := db.Prepare(&db.Options{
 		ConnectionString: dbURL,
-		Logger:           log.New(),
+		Logger:           log.WithFields(log.Fields{}),
 	})
 	defer runnable.Close(nil)
 

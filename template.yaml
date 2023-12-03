@@ -33,7 +33,7 @@ Resources:
     UploadFaaAircraftRegistrationDaily:
         Type: AWS::Serverless::Function
         Properties:
-            Runtime: go1.x
+            Runtime: provided.al2
             Handler: download/download
             Timeout: 300
             CodeUri: .

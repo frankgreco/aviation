@@ -2,7 +2,7 @@
 ![deploy](https://github.com/frankgreco/aviation/workflows/deploy/badge.svg)
 
 ## ui
-```
+```sh
 $ cd ui
 $ npm run start
 $ open localhost:8000
@@ -14,7 +14,7 @@ The download app will retrieve the [database](https://www.faa.gov/licenses_certi
 
 The following is an example an example log after a successful execution.
 
-```
+```sh
 INFO[0000] retrieving archive file from url              url="http://registry.faa.gov/database/ReleasableAircraft.zip"
 INFO[0000] successfully retrieved archive file from url  fields.time=388.4231ms url="http://registry.faa.gov/database/ReleasableAircraft.zip"
 INFO[0004] unzipping archive
@@ -43,7 +43,7 @@ INFO[0041] successfully uploaded all files to aws s3     fields.time=34.93322500
 The load app will update a PostgreSQL database every day from the updated FAA database. This will run as an AWS Lambda function and will be triggered after the completion of the _download_ application.
 
 The following is an example log after a successful execution
-```
+```sh
 INFO[0000] creating aws session
 INFO[0000] successfully created aws session
 INFO[0000] now                                           fields.time="2020-06-25 19:46:52.342048 -0700 PDT m=+0.003518102"

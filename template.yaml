@@ -49,32 +49,32 @@ Resources:
                         Schedule: cron(0 6 * * ? *)
             Tags: 
                 project: aviation
-    # UpdateDatabase:
-    #     Type: AWS::Serverless::Function
-    #     Properties:
-    #         Runtime: go1.x
-    #         Handler: load/load
-    #         Timeout: 300
-    #         CodeUri: .
-    #         MemorySize: 2048
-    #         Environment:
-    #             Variables:
-    #                 RDS_USERNAME: !Ref RdsUsername
-    #                 RDS_PASSWORD: !Ref RdsPassword
-    #                 RDS_ENDPOINT: !Ref RdsEndpoint
-    #         Policies:
-    #         - S3ReadPolicy:
-    #             BucketName: aircraft-registry
-    #         Events:
-    #             Daily:
-    #                 InvocationLevel:
-    #                 # I want this to run after the previous lambda finishes
-    #                 # I can do this through the UI but don't yet know
-    #                 # how to configure it with this template.
-    #                 # 
-    #                 # We'll default to an hour after the previous lambda is invoked.
-    #                 Type: Schedule
-    #                 Properties:
-    #                     Schedule: cron(0 7 * * ? *)
-    #         Tags: 
-    #             project: aviation
+    UpdateDatabase:
+        Type: AWS::Serverless::Function
+        Properties:
+            Runtime: provided.al2
+            Handler: bootstrap
+            Timeout: 300
+            CodeUri: load/
+            MemorySize: 2048
+            Environment:
+                Variables:
+                    RDS_USERNAME: !Ref RdsUsername
+                    RDS_PASSWORD: !Ref RdsPassword
+                    RDS_ENDPOINT: !Ref RdsEndpoint
+            Policies:
+            - S3ReadPolicy:
+                BucketName: aircraft-registry
+            Events:
+                Daily:
+                    InvocationLevel:
+                    # I want this to run after the previous lambda finishes
+                    # I can do this through the UI but don't yet know
+                    # how to configure it with this template.
+                    # 
+                    # We'll default to an hour after the previous lambda is invoked.
+                    Type: Schedule
+                    Properties:
+                        Schedule: cron(0 7 * * ? *)
+            Tags: 
+                project: aviation

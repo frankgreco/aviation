@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/frankgreco/aviation/utils/db"
+	"github.com/frankgreco/aviation/internal/db"
 )
 
 type AircraftType int32

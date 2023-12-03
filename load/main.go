@@ -61,13 +61,13 @@ func do(ctx context.Context) error {
 	}
 	log.Info("successfully created aws session")
 
-	dbase, err := db.New(dbURL, log.New().WithFields(log.Fields{
-		"app": "database",
-	}))
-	if err != nil {
-		return err
-	}
-	defer dbase.Close()
+	runnable := db.Prepare(&db.Options{
+		ConnectionString: dbURL,
+		Logger:           log.New(),
+	})
+	defer runnable.Close(nil)
+
+	dbase := runnable.(*db.DB)
 
 	log.WithFields(log.Fields{
 		"time": aviation.Now,
@@ -259,7 +259,7 @@ func new(resource string, existing []api.RowBuilder, query squirrel.SelectBuilde
 			return
 		}),
 	}); err != nil && err != db.ErrNotFound {
-		dbase.Close()
+		// dbase.Close()
 		return nil, err
 	}
 

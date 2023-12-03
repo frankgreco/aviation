@@ -25,7 +25,7 @@ import (
 
 	"github.com/frankgreco/aviation"
 	"github.com/frankgreco/aviation/api"
-	"github.com/frankgreco/aviation/utils/db"
+	"github.com/frankgreco/aviation/internal/db"
 )
 
 var (

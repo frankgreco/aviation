@@ -23,34 +23,51 @@ func main() {
 }
 
 func do(ctx context.Context) error {
-
-	log.WithFields(log.Fields{
+	logger := log.WithFields(log.Fields{
 		"url": aviation.FaaDatabaseURL,
-	}).Info("retrieving archive file from url")
+	})
 
-	// download zip file
-	beginDownload := time.Now()
-	resp, err := http.Get(aviation.FaaDatabaseURL)
+	logger.Info("retrieving archive file from url")
+
+	start := time.Now()
+
+	client := &http.Client{
+		Timeout: 1 * time.Minute,
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, aviation.FaaDatabaseURL, nil)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"url": aviation.FaaDatabaseURL,
+			"err": err.Error(),
+		}).Error("could not create http request")
+
+		return err
+	}
+
+	// The FAA recently started blocking requests that do not have a User Agent.
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110")
+
+	resp, err := client.Do(req)
+	
+	logger.WithFields(log.Fields{
+		"time": time.Since(start),
+	}).Info("completed retrieval")
+
+	if err != nil {
+		log.WithFields(log.Fields{
 			"err": err.Error(),
 		}).Error("could not retrieve file from url")
+		
 		return err
 	}
 	defer resp.Body.Close()
 
-	log.WithFields(log.Fields{
-		"time": time.Since(beginDownload),
-		"url":  aviation.FaaDatabaseURL,
-	}).Info("successfully retrieved archive file from url")
-
-	// read response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err.Error(),
 		}).Error("could not read response body")
+		
 		return err
 	}
 
@@ -62,6 +79,7 @@ func do(ctx context.Context) error {
 		log.WithFields(log.Fields{
 			"err": err.Error(),
 		}).Error("could not unzip response body")
+		
 		return err
 	}
 

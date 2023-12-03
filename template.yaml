@@ -36,9 +36,9 @@ Resources:
             BuildMethod: go1.x 
         Properties:
             Runtime: provided.al2
-            Handler: download/bootstrap
+            Handler: bootstrap
             Timeout: 300
-            CodeUri: .
+            CodeUri: download/
             MemorySize: 2048
             Policies:
             - S3WritePolicy:

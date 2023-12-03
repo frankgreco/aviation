@@ -17,7 +17,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
     - name: build download
-      run: cd download && GOARCH=amd64 GOOS=linux go build -o bootstrap ./... && zip -FS bootstrap.zip bootstrap
+      run: cd download && GOARCH=amd64 GOOS=linux go build -tags lambda.norpc -o bootstrap ./... && zip -FS bootstrap.zip bootstrap
     # - name: build load
     #   run: cd load && go build ./...
     # - name: build query

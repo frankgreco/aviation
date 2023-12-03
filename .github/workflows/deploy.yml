@@ -17,7 +17,7 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
     - name: build download
-      run: cd download && GOARCH=arm64 GOOS=linux CGO_ENABLED=0 go build -o bootstrap ./... && zip bootstrap.zip bootstrap
+      run: cd download && GOARCH=amd64 GOOS=linux CGO_ENABLED=0 go build -o bootstrap ./... && zip bootstrap.zip bootstrap
     # - name: build load
     #   run: cd load && go build ./...
     # - name: build query

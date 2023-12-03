@@ -33,17 +33,22 @@ type Options struct {
 }
 
 func Prepare(opts *Options) run.Runnable {
-	runnable := new(DB)
+	runnable := &DB{
+		Logger: opts.Logger,
+	}
 
 	conn, err := sqlx.Open("pgx", opts.ConnectionString)
 	if err != nil {
+		runnable.Logger.WithFields(log.Fields{
+			"err": err.Error(),
+		}).Error("could not open connection to database")
+
 		runnable.err = err
 		return runnable
 	}
 
 	runnable.ctx, runnable.cancel = context.WithCancel(context.Background())
 	runnable.DB = conn
-	runnable.Logger = opts.Logger
 
 	return runnable
 }

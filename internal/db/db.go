@@ -39,10 +39,7 @@ func Prepare(opts *Options) run.Runnable {
 
 	conn, err := sqlx.Open("pgx", opts.ConnectionString)
 	if err != nil {
-		runnable.Logger.WithFields(log.Fields{
-			"err": err.Error(),
-		}).Error("could not open connection to database")
-
+		runnable.Logger.Error(fmt.Sprintf("error opening database connection: %s", err.Error()))
 		runnable.err = err
 		return runnable
 	}

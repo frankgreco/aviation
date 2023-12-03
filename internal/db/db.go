@@ -13,6 +13,8 @@ import (
 
 	"github.com/frankgreco/aviation/internal/log"
 	"github.com/frankgreco/aviation/internal/run"
+
+	_ "github.com/lib/pq"
 )
 
 var (

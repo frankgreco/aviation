@@ -32,6 +32,8 @@ Resources:
     #                     Method: GET
     UploadFaaAircraftRegistrationDaily:
         Type: AWS::Serverless::Function
+        Metadata:
+            BuildMethod: go1.x 
         Properties:
             Runtime: provided.al2
             Handler: download/bootstrap
